@@ -31,6 +31,8 @@ At first, I tried to make it a clean, PR'able option, but I got lazy halfway thr
 
 I wanted just the color codes, big and bold, on both sides of the label. I used 4x4" 4 mil bags i had lying around, which fit nicely into a box I already had.
 
+Labels are made to fold over the edge of the bag. They're repeated, not flipped, so the opening is always on the same side (left for me) and when you flip through the box, the labels always look right side up.
+
 The original in turn is based on an idea from Zach Poff.
 
 For more details on how to use these labels, visit his website:
