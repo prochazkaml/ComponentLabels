@@ -11,7 +11,7 @@ The generated labels include:
 -   3- and 4-digit smd codes
 -   EIA-96 smd code
 
-<img src="Example.svg">
+<img src="Example.png">
 
 # Usage
 
@@ -24,6 +24,10 @@ The generated labels include:
 It will now generate a `ResistorLabels.pdf` that can be used to print onto AVERY 5260/L7157.
 
 # More Details
+
+This is forked from https://github.com/Finomnis/ResistorLabels
+
+At first, I tried to make it a clean, PR'able option, but I got lazy halfway through.
 
 This is based on an idea from Zach Poff.
 
