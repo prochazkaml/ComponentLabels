@@ -29,7 +29,9 @@ This is forked from https://github.com/Finomnis/ResistorLabels
 
 At first, I tried to make it a clean, PR'able option, but I got lazy halfway through.
 
-This is based on an idea from Zach Poff.
+I wanted just the color codes, big and bold, on both sides of the label. I used 4x4" 4 mil bags i had lying around, which fit nicely into a box I already had.
+
+The original in turn is based on an idea from Zach Poff.
 
 For more details on how to use these labels, visit his website:
 
