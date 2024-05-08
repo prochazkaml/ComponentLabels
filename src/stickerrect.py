@@ -1,6 +1,6 @@
 from reportlab.pdfgen.canvas import Canvas
 
-from paperconfig import PaperConfig
+from src.paperconfig import PaperConfig
 
 class StickerRect:
     def __init__(self, c: Canvas, layout: PaperConfig, row: int, column: int, mirror: bool):

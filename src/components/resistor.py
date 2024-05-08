@@ -4,8 +4,8 @@ from reportlab.lib.units import inch
 from typing import List
 import math
 
-from stickerrect import StickerRect
-from components.component import Component
+from src.stickerrect import StickerRect
+from src.components.component import Component
 
 class Resistor(Component):
     def __init__(self, ohms: float):
