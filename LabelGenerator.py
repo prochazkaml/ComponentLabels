@@ -12,8 +12,6 @@ import sys
 
 from typing import Tuple, Union, Optional, List
 
-ResistorList = List[Union[Optional[float], List[Optional[float]]]]
-
 
 def load_font(font_name: str) -> None:
     pdfmetrics.registerFont(TTFont('Arial Bold', font_name))
@@ -118,6 +116,21 @@ EJ_RANGE_24 = PaperConfig(
 )
 
 
+VYSOCINA = PaperConfig( # Available from: https://www.obalyvysocina.cz/produkty/samolepici-etikety#70x254-mm3300-ks
+    paper_name="Samolepky z Vysočiny",
+    pagesize=A4,
+    sticker_width=62 * mm,
+    sticker_height=24 * mm,
+    sticker_corner_radius=0,
+    left_margin=4 * mm,
+    top_margin=8.8 * mm,
+    horizontal_stride=70 * mm,
+    vertical_stride=25.4 * mm,
+    num_stickers_horizontal=3,
+    num_stickers_vertical=11
+)
+
+
 class StickerRect:
     def __init__(self, c: Canvas, layout: PaperConfig, row: int, column: int, mirror: bool):
         self.left = layout.left_margin + layout.horizontal_stride * column
@@ -149,7 +162,12 @@ class StickerRect:
             self._c.restoreState()
 
 
-class ResistorValue:
+class Component:
+    def draw(self, c: Canvas, rect: StickerRect, draw_center_line: bool) -> None:
+        raise Exception("called parent class")
+
+
+class Resistor(Component):
     def __init__(self, ohms: float):
         ohms_exp = 0
         ohms_val = 0
@@ -205,7 +223,6 @@ class ResistorValue:
             return str(self.ohms_val)
 
     def format_value(self) -> str:
-
         if self.ohms_exp < 0:
             rendered_num = str(self.ohms_val)
             while rendered_num[-1] == "0":
@@ -217,288 +234,235 @@ class ResistorValue:
             if self.ohms_exp == -3:
                 return "0.00" + rendered_num
 
-        return self.get_prefixed_number() + self.get_prefix()
+        return self.get_prefixed_number() + " " + self.get_prefix() + "\u2126"
 
+    def resistor_color_table(self, num: int) -> HexColor:
+        return [
+            HexColor("#000000"),
+            HexColor("#964B00"),
+            HexColor("#FF3030"),
+            HexColor("#FFA500"),
+            HexColor("#FFFF00"),
+            HexColor("#00FF00"),
+            HexColor("#0000FF"),
+            HexColor("#C520F6"),
+            HexColor("#808080"),
+            HexColor("#FFFFFF"),
+        ][num]
 
-def resistor_color_table(num: int) -> HexColor:
-    return [
-        HexColor("#000000"),
-        HexColor("#964B00"),
-        HexColor("#FF3030"),
-        HexColor("#FFA500"),
-        HexColor("#FFFF00"),
-        HexColor("#00FF00"),
-        HexColor("#0000FF"),
-        HexColor("#C520F6"),
-        HexColor("#808080"),
-        HexColor("#FFFFFF"),
-    ][num]
-
-
-def draw_fancy_resistor_stripe(
-    c: Canvas,
-    x: float,
-    y: float,
-    width: float,
-    height: float,
-    color_table: List[HexColor]
-) -> None:
-    c.setFillColor(color_table[2])
-    c.rect(x, y+height*5/6, width, height/6, fill=1, stroke=0)
-    c.setFillColor(color_table[1])
-    c.rect(x, y+height*4/6, width, height/6, fill=1, stroke=0)
-    c.setFillColor(color_table[0])
-    c.rect(x, y+height*3/6, width, height/6, fill=1, stroke=0)
-    c.setFillColor(color_table[1])
-    c.rect(x, y+height*2/6, width, height/6, fill=1, stroke=0)
-    c.setFillColor(color_table[2])
-    c.rect(x, y+height*1/6, width, height/6, fill=1, stroke=0)
-    c.setFillColor(color_table[3])
-    c.rect(x, y+height*0/6, width, height/6, fill=1, stroke=0)
-
-
-def draw_resistor_stripe_border(c: Canvas, x: float, y: float, width: float, height: float) -> None:
-    c.setLineWidth(0.3)
-    c.setFillColor(black, 0.0)
-    c.setStrokeColorRGB(0.2, 0.2, 0.2, 0.5)
-    c.rect(x, y, width, height, fill=0, stroke=1)
-
-
-def draw_resistor_stripe(c: Canvas, x: float, y: float, width: float, height: float, stripe_value: int) -> None:
-    if 0 <= stripe_value <= 9:
-        c.setFillColor(resistor_color_table(stripe_value))
-        c.rect(x, y, width, height, fill=1, stroke=0)
-        draw_resistor_stripe_border(c, x, y, width, height)
-        return
-
-    elif stripe_value == -1:
-        gold_table = [
-            HexColor("#FFF0A0"),
-            HexColor("#FFE55C"),
-            HexColor("#FFD700"),
-            HexColor("#D1B000"),
-        ]
-
-        draw_fancy_resistor_stripe(c, x, y, width, height, gold_table)
-        draw_resistor_stripe_border(c, x, y, width, height)
-        return
-
-    elif stripe_value == -2:
-        silver_table = [
-            HexColor("#D0D0D0"),
-            HexColor("#A9A9A9"),
-            HexColor("#929292"),
-            HexColor("#7B7B7B"),
-        ]
-
-        draw_fancy_resistor_stripe(c, x, y, width, height, silver_table)
-        draw_resistor_stripe_border(c, x, y, width, height)
-        return
-
-    else:
-
-        c.setLineWidth(0.5)
-        c.setFillColor(gray, 0.3)
-        c.setStrokeColorRGB(0.5, 0.5, 0.5, 1.0)
-        c.rect(x, y, width, height, fill=1, stroke=1)
-        c.line(x, y, x + width, y + height)
-        c.line(x + width, y, x, y + height)
-        return
-
-
-def draw_resistor_colorcode(
+    def draw_fancy_resistor_stripe(
+        self,
         c: Canvas,
-        value: ResistorValue,
-        color1: object,
-        color2: object,
         x: float,
         y: float,
         width: float,
         height: float,
-        num_codes: int,
-        draw_minimal: bool = False
-) -> None:
+        color_table: List[HexColor]
+    ) -> None:
+        c.setFillColor(color_table[2])
+        c.rect(x, y+height*5/6, width, height/6, fill=1, stroke=0)
+        c.setFillColor(color_table[1])
+        c.rect(x, y+height*4/6, width, height/6, fill=1, stroke=0)
+        c.setFillColor(color_table[0])
+        c.rect(x, y+height*3/6, width, height/6, fill=1, stroke=0)
+        c.setFillColor(color_table[1])
+        c.rect(x, y+height*2/6, width, height/6, fill=1, stroke=0)
+        c.setFillColor(color_table[2])
+        c.rect(x, y+height*1/6, width, height/6, fill=1, stroke=0)
+        c.setFillColor(color_table[3])
+        c.rect(x, y+height*0/6, width, height/6, fill=1, stroke=0)
 
-    if value.ohms_exp < num_codes - 4:
-        return
+    def draw_resistor_stripe_border(self, c: Canvas, x: float, y: float, width: float, height: float) -> None:
+        c.setLineWidth(0.3)
+        c.setFillColor(black, 0.0)
+        c.setStrokeColorRGB(0.2, 0.2, 0.2, 0.5)
+        c.rect(x, y, width, height, fill=0, stroke=1)
 
+    def draw_resistor_stripe(self, c: Canvas, x: float, y: float, width: float, height: float, stripe_value: int) -> None:
+        if 0 <= stripe_value <= 9:
+            c.setFillColor(self.resistor_color_table(stripe_value))
+            c.rect(x, y, width, height, fill=1, stroke=0)
+            self.draw_resistor_stripe_border(c, x, y, width, height)
+            return
 
-    if not draw_minimal:
-        border = height/6
-        corner = (height-2*border)/4
+        elif stripe_value == -1:
+            gold_table = [
+                HexColor("#FFF0A0"),
+                HexColor("#FFE55C"),
+                HexColor("#FFD700"),
+                HexColor("#D1B000"),
+            ]
 
-        c.saveState()
-        p = c.beginPath()
-        p.roundRect(x+border, y+border, width-2*border, height-2*border, corner)
-        c.clipPath(p, stroke=0)
-        c.linearGradient(x+width/2, y+border+height, x+width/2, y+border, (color1, color2))
-        c.restoreState()
+            self.draw_fancy_resistor_stripe(c, x, y, width, height, gold_table)
+            self.draw_resistor_stripe_border(c, x, y, width, height)
+            return
+        elif stripe_value == -2:
+            silver_table = [
+                HexColor("#D0D0D0"),
+                HexColor("#A9A9A9"),
+                HexColor("#929292"),
+                HexColor("#7B7B7B"),
+            ]
 
-        width_without_corner = width - 2*border - 2*corner
-        stripe_width = width_without_corner/10
-    else:
+            self.draw_fancy_resistor_stripe(c, x, y, width, height, silver_table)
+            self.draw_resistor_stripe_border(c, x, y, width, height)
+            return
+        else:
+            c.setLineWidth(0.5)
+            c.setFillColor(gray, 0.3)
+            c.setStrokeColorRGB(0.5, 0.5, 0.5, 1.0)
+            c.rect(x, y, width, height, fill=1, stroke=1)
+            c.line(x, y, x + width, y + height)
+            c.line(x + width, y, x, y + height)
+            return
+
+    def draw_resistor_colorcode(
+            self,
+            c: Canvas,
+            color1: object,
+            color2: object,
+            x: float,
+            y: float,
+            width: float,
+            height: float,
+            num_codes: int,
+    ) -> None:
+
+        if self.ohms_exp < num_codes - 4:
+            return
+
         border=0
         corner=0
         width_without_corner=width
         stripe_width=width/num_codes/2
 
-    if value.ohms_val == 0:
-        draw_resistor_stripe(c,
-                             x + border + corner + stripe_width / 2 + 2 * stripe_width * 2,
-                             y + border,
-                             stripe_width,
-                             height - 2 * border,
-                             0)
-    else:
-        for i in range(num_codes):
-
-            if i == num_codes - 1:
-                stripe_value = value.ohms_exp + 2 - num_codes
-            else:
-                stripe_value = value.ohms_val
-                for _ in range(2-i):
-                    stripe_value //= 10
-                stripe_value %= 10
-
-            draw_resistor_stripe(c,
-                                 x + border + corner + stripe_width / 2 + 2 * stripe_width * i,
+        if self.ohms_val == 0:
+            self.draw_resistor_stripe(c,
+                                 x + border + corner + stripe_width / 2 + 2 * stripe_width * 2,
                                  y + border,
                                  stripe_width,
                                  height - 2 * border,
-                                 stripe_value)
+                                 0)
+        else:
+            for i in range(num_codes):
+                if i == num_codes - 1:
+                    stripe_value = self.ohms_exp + 2 - num_codes
+                else:
+                    stripe_value = self.ohms_val
+                    for _ in range(2-i):
+                        stripe_value //= 10
+                    stripe_value %= 10
 
-            if not draw_minimal:
-                draw_resistor_stripe(c,
-                                x + width - border - corner - stripe_width * 1.5,
-                                y + border,
-                                stripe_width,
-                                height - 2 * border,
-                                -3)
+                self.draw_resistor_stripe(c,
+                                     x + border + corner + stripe_width / 2 + 2 * stripe_width * i,
+                                     y + border,
+                                     stripe_width,
+                                     height - 2 * border,
+                                     stripe_value)
 
-    c.setFillColor(black)
-    c.setStrokeColor(black, 1)
-    c.setLineWidth(0.5)
-    if not draw_minimal:
-        c.roundRect(x+border, y+border, width-2*border, height-2*border, corner)
+        c.setFillColor(black)
+        c.setStrokeColor(black, 1)
+        c.setLineWidth(0.5)
 
+    def get_3digit_code(self) -> str:
+        if self.ohms_val % 10 != 0:
+            return ""
 
-def get_3digit_code(value: ResistorValue) -> str:
-    if value.ohms_val % 10 != 0:
+        if self.ohms_val == 0:
+            return "000"
+
+        digits = str(self.ohms_val // 10)
+
+        if self.ohms_exp > 0:
+            multiplier = str(self.ohms_exp - 1)
+            return digits + multiplier
+
+        if self.ohms_exp == 0:
+            return digits[0] + "R" + digits[1]
+
+        if self.ohms_exp == -1:
+            return "R" + digits
+
+        if self.ohms_exp == -2:
+            if self.ohms_val % 100 != 0:
+                return ""
+            return "R0" + digits[0]
+
         return ""
 
-    if value.ohms_val == 0:
-        return "000"
+    def get_4digit_code(self) -> str:
+        digits = str(self.ohms_val)
 
-    digits = str(value.ohms_val // 10)
+        if self.ohms_val == 0:
+            return "0000"
 
-    if value.ohms_exp > 0:
-        multiplier = str(value.ohms_exp - 1)
+        if self.ohms_exp > 1:
+            multiplier = str(self.ohms_exp - 2)
+            return digits + multiplier
+
+        if self.ohms_exp == 1:
+            return digits[0] + digits[1] + "R" + digits[2]
+
+        if self.ohms_exp == 0:
+            return digits[0] + "R" + digits[1] + digits[2]
+
+        if self.ohms_exp == -1:
+            return "R" + digits
+
+        if self.ohms_exp == -2:
+            if self.ohms_val % 10 != 0:
+                return ""
+            return "R0" + digits[0] + digits[1]
+
+        if self.ohms_exp == -3:
+            if self.ohms_val % 100 != 0:
+                return ""
+            return "R00" + digits[0]
+
+        return ""
+
+    def get_eia98_code(self) -> str:
+        eia98_coding_table = {
+            100: "01", 178: "25", 316: "49", 562: "73",
+            102: "02", 182: "26", 324: "50", 576: "74",
+            105: "03", 187: "27", 332: "51", 590: "75",
+            107: "04", 191: "28", 340: "52", 604: "76",
+            110: "05", 196: "29", 348: "53", 619: "77",
+            113: "06", 200: "30", 357: "54", 634: "78",
+            115: "07", 205: "31", 365: "55", 649: "79",
+            118: "08", 210: "32", 374: "56", 665: "80",
+            121: "09", 215: "33", 383: "57", 681: "81",
+            124: "10", 221: "34", 392: "58", 698: "82",
+            127: "11", 226: "35", 402: "59", 715: "83",
+            130: "12", 232: "36", 412: "60", 732: "84",
+            133: "13", 237: "37", 422: "61", 750: "85",
+            137: "14", 243: "38", 432: "62", 768: "86",
+            140: "15", 249: "39", 442: "63", 787: "87",
+            143: "16", 255: "40", 453: "64", 806: "88",
+            147: "17", 261: "41", 464: "65", 825: "89",
+            150: "18", 267: "42", 475: "66", 845: "90",
+            154: "19", 274: "43", 487: "67", 866: "91",
+            158: "20", 280: "44", 499: "68", 887: "92",
+            162: "21", 287: "45", 511: "69", 909: "93",
+            165: "22", 294: "46", 523: "70", 931: "94",
+            169: "23", 301: "47", 536: "71", 953: "95",
+            174: "24", 309: "48", 549: "72", 976: "96",
+        }
+
+        if self.ohms_val not in eia98_coding_table:
+            return ""
+
+        digits = eia98_coding_table[self.ohms_val]
+
+        multiplier_table = ["Z", "Y", "X", "A", "B", "C", "D", "E", "F"]
+        if not (0 <= self.ohms_exp+1 < len(multiplier_table)):
+            return ""
+
+        multiplier = multiplier_table[self.ohms_exp+1]
+
         return digits + multiplier
 
-    if value.ohms_exp == 0:
-        return digits[0] + "R" + digits[1]
-
-    if value.ohms_exp == -1:
-        return "R" + digits
-
-    if value.ohms_exp == -2:
-        if value.ohms_val % 100 != 0:
-            return ""
-        return "R0" + digits[0]
-
-    return ""
-
-
-def get_4digit_code(value: ResistorValue) -> str:
-    digits = str(value.ohms_val)
-
-    if value.ohms_val == 0:
-        return "0000"
-
-    if value.ohms_exp > 1:
-        multiplier = str(value.ohms_exp - 2)
-        return digits + multiplier
-
-    if value.ohms_exp == 1:
-        return digits[0] + digits[1] + "R" + digits[2]
-
-    if value.ohms_exp == 0:
-        return digits[0] + "R" + digits[1] + digits[2]
-
-    if value.ohms_exp == -1:
-        return "R" + digits
-
-    if value.ohms_exp == -2:
-        if value.ohms_val % 10 != 0:
-            return ""
-        return "R0" + digits[0] + digits[1]
-
-    if value.ohms_exp == -3:
-        if value.ohms_val % 100 != 0:
-            return ""
-        return "R00" + digits[0]
-
-    return ""
-
-
-def get_eia98_code(value: ResistorValue) -> str:
-    eia98_coding_table = {
-        100: "01", 178: "25", 316: "49", 562: "73",
-        102: "02", 182: "26", 324: "50", 576: "74",
-        105: "03", 187: "27", 332: "51", 590: "75",
-        107: "04", 191: "28", 340: "52", 604: "76",
-        110: "05", 196: "29", 348: "53", 619: "77",
-        113: "06", 200: "30", 357: "54", 634: "78",
-        115: "07", 205: "31", 365: "55", 649: "79",
-        118: "08", 210: "32", 374: "56", 665: "80",
-        121: "09", 215: "33", 383: "57", 681: "81",
-        124: "10", 221: "34", 392: "58", 698: "82",
-        127: "11", 226: "35", 402: "59", 715: "83",
-        130: "12", 232: "36", 412: "60", 732: "84",
-        133: "13", 237: "37", 422: "61", 750: "85",
-        137: "14", 243: "38", 432: "62", 768: "86",
-        140: "15", 249: "39", 442: "63", 787: "87",
-        143: "16", 255: "40", 453: "64", 806: "88",
-        147: "17", 261: "41", 464: "65", 825: "89",
-        150: "18", 267: "42", 475: "66", 845: "90",
-        154: "19", 274: "43", 487: "67", 866: "91",
-        158: "20", 280: "44", 499: "68", 887: "92",
-        162: "21", 287: "45", 511: "69", 909: "93",
-        165: "22", 294: "46", 523: "70", 931: "94",
-        169: "23", 301: "47", 536: "71", 953: "95",
-        174: "24", 309: "48", 549: "72", 976: "96",
-    }
-
-    if value.ohms_val not in eia98_coding_table:
-        return ""
-
-    digits = eia98_coding_table[value.ohms_val]
-
-    multiplier_table = ["Z", "Y", "X", "A", "B", "C", "D", "E", "F"]
-    if not (0 <= value.ohms_exp+1 < len(multiplier_table)):
-        return ""
-
-    multiplier = multiplier_table[value.ohms_exp+1]
-
-    return digits + multiplier
-
-
-def draw_resistor_sticker(
-        c: Canvas,
-        layout: PaperConfig,
-        row: int,
-        column: int,
-        ohms: float,
-        draw_center_line: bool,
-        mirror: bool,
-        draw_minimal: bool
-) -> None:
-    with StickerRect(c, layout, row, column, mirror) as rect:
-
-        # Squish horizontally by a bit, to prevent clipping
-        rect.width -= 0.1*inch
-        rect.left += 0.05*inch
-
+    def draw(self, c: Canvas, rect: StickerRect, draw_center_line: bool) -> None:
         # Draw middle line
         if draw_center_line:
             c.setStrokeColor(black, 0.25)
@@ -509,80 +473,40 @@ def draw_resistor_sticker(
                    rect.bottom + rect.height/2)
 
         # Draw resistor value
-        resistor_value = ResistorValue(ohms)
-        print("Generating sticker '{}'".format(resistor_value.format_value()))
+        print("Generating sticker '{}'".format(self.format_value()))
 
         value_font_size = 0.25 * inch
-        ohm_font_size = 0.15 * inch
         smd_font_size = 0.08 * inch
         space_between = 5
 
-        value_string = resistor_value.format_value()
-        ohm_string = "\u2126"
+        value_string = self.format_value()
         value_width = c.stringWidth(value_string, 'Arial Bold', value_font_size * 1.35)
-        ohm_width = c.stringWidth(ohm_string, 'Arial Bold', ohm_font_size * 1.35)
-        total_text_width = ohm_width + value_width + space_between
-        if not draw_minimal:
-            text_left = rect.left + rect.width/4 - total_text_width/2
-            text_bottom = rect.bottom + rect.height/4 - value_font_size/2
-            c.setFont('Arial Bold', value_font_size * 1.35)
-            c.drawString(text_left, text_bottom, value_string)
-            c.setFont('Arial Bold', ohm_font_size * 1.35)
-            c.drawString(text_left + value_width + space_between, text_bottom, ohm_string)
-        else:
-            text_middle = rect.left + rect.width/2
-            text_bottom = rect.bottom + rect.height/4 - value_font_size/5
-            c.setFont('Arial Bold', value_font_size * 1)
-            c.drawCentredString(text_middle, text_bottom, value_string+" "+ohm_string)
-            c.drawCentredString(text_middle, text_bottom+rect.height/2, value_string+" "+ohm_string)
+
+        text_middle = rect.left + rect.width/2
+        text_bottom = rect.bottom + rect.height/4 - value_font_size/5
+        c.setFont('Arial Bold', value_font_size * 1)
+        c.drawCentredString(text_middle, text_bottom, value_string)
+        c.drawCentredString(text_middle, text_bottom+rect.height/2, value_string)
 
     
         # Draw resistor color code
-        if not draw_minimal:
-            draw_resistor_colorcode(c, resistor_value,
-                                    toColor("hsl(55, 54%, 100%)"), toColor("hsl(55, 54%, 70%)"),
-                                    rect.left + rect.width/2,
-                                    rect.bottom + rect.height/4 - rect.height/45,
-                                    rect.width/4, rect.height/4,
-                                    3)
-            draw_resistor_colorcode(c, resistor_value,
-                                    toColor("hsl(197, 59%, 100%)"), toColor("hsl(197, 59%, 73%)"),
-                                    rect.left + rect.width * 0.75,
-                                    rect.bottom + rect.height/4 - rect.height/45,
-                                    rect.width/4, rect.height/4,
-                                    4)
-        else:
-            for bottom in (rect.bottom+rect.height/16, rect.bottom+rect.height*8/16):
-                for stripes in (3,4):
-                    draw_resistor_colorcode(c, resistor_value,
-                                            toColor("hsl(55, 54%, 100%)"), toColor("hsl(55, 54%, 70%)"),
-                                            rect.left+rect.width*((stripes-3)*2/3),
-                                            bottom,
-                                            rect.width/3, rect.height*7/16,
-                                            stripes, draw_minimal)
-            # draw_resistor_colorcode(c, resistor_value,
-            #                         toColor("hsl(197, 59%, 100%)"), toColor("hsl(197, 59%, 73%)"),
-            #                         rect.left + rect.width*2/3,
-            #                         rect.bottom + rect.height/32,
-            #                         rect.width/3, rect.height*15/16,
-            #                         4, draw_minimal)
+        for bottom in (rect.bottom+rect.height/16, rect.bottom+rect.height*8/16):
+            for stripes in (3,4):
+                self.draw_resistor_colorcode(c,
+                                        toColor("hsl(55, 54%, 100%)"), toColor("hsl(55, 54%, 70%)"),
+                                        rect.left+rect.width*((stripes-3)*2/3),
+                                        bottom,
+                                        rect.width/3, rect.height*7/16,
+                                        stripes)
 
         c.setFont('Arial Bold', smd_font_size * 1.35)
-        if not draw_minimal:
-            c.drawString(rect.left + rect.width/2 + rect.width/32, rect.bottom +
-                        rect.height/13, get_3digit_code(resistor_value))
-            c.drawCentredString(rect.left + rect.width*3/4, rect.bottom +
-                                rect.height/13, get_4digit_code(resistor_value))
-            c.drawRightString(rect.left + rect.width - rect.width/32, rect.bottom +
-                            rect.height/13, get_eia98_code(resistor_value))
-        else:
-            for i in (0,rect.height/2):
-                c.drawString(rect.left + rect.width/3, rect.bottom +
-                            rect.height/13+i, get_3digit_code(resistor_value))
-                c.drawCentredString(rect.left + rect.width/2, rect.bottom +
-                                    rect.height/13+i, get_4digit_code(resistor_value))
-                c.drawRightString(rect.left + rect.width*2/3, rect.bottom +
-                                rect.height/13+i, get_eia98_code(resistor_value))
+        for i in (0,rect.height/2):
+            c.drawString(rect.left + rect.width/3, rect.bottom +
+                        rect.height/13+i, self.get_3digit_code())
+            c.drawCentredString(rect.left + rect.width/2, rect.bottom +
+                                rect.height/13+i, self.get_4digit_code())
+            c.drawRightString(rect.left + rect.width*2/3, rect.bottom +
+                            rect.height/13+i, self.get_eia98_code())
 
 
 def begin_page(c: Canvas, layout: PaperConfig, draw_outlines: bool) -> None:
@@ -598,28 +522,17 @@ def end_page(c: Canvas) -> None:
 def render_stickers(
     c: Canvas,
     layout: PaperConfig,
-    values: ResistorList,
+    values: List[Component],
     draw_outlines: bool,
     draw_center_line: bool,
-    draw_both_sides: bool,
-    draw_minimal: bool
 ) -> None:
-    def flatten(elem: Union[Optional[float], List[Optional[float]]]) -> List[Optional[float]]:
-        if isinstance(elem, list):
-            return elem
-        else:
-            return [elem]
-
-    # Flatten
-    values_flat: List[Optional[float]] = [elem for nested in values for elem in flatten(nested)]
-
     # Set the title
     c.setTitle(f"Resistor Labels - {layout.paper_name}")
 
     # Begin the first page
     begin_page(c, layout, draw_outlines)
 
-    for (position, value) in enumerate(values_flat):
+    for (position, value) in enumerate(values):
         rowId = (position // layout.num_stickers_horizontal) % layout.num_stickers_vertical
         columnId = position % layout.num_stickers_horizontal
 
@@ -629,9 +542,8 @@ def render_stickers(
             begin_page(c, layout, draw_outlines)
 
         if value is not None:
-            draw_resistor_sticker(c, layout, rowId, columnId, value, draw_center_line, False,draw_minimal)
-            if draw_both_sides:
-                draw_resistor_sticker(c, layout, rowId, columnId, value, False, True, draw_minimal)
+            with StickerRect(c, layout, rowId, columnId, False) as rect:
+                value.draw(c, rect, draw_center_line)
 
     # End the page one final time
     end_page(c)
@@ -651,42 +563,31 @@ def main() -> None:
     # ############################################################################
     # Select the correct type of paper you want to print on.
     # ############################################################################
-    layout = AVERY_5260
+    layout = VYSOCINA
     # layout = AVERY_L7157
     # layout = EJ_RANGE_24
 
     # ############################################################################
-    # Put your own resistor values in here!
-    #
-    # This has to be either a 2D grid or a 1D array.
+    # Put your own component values in here!
     #
     # Add "None" if no label should get generated at a specific position.
     # ############################################################################
-    resistor_values: ResistorList = [
-        10,22,47,
-    #    15,33,68,
-    #    12,18,27,39,56,82,
-        100,150,220,330,470,680,
-    #    120,180,270,390,560,820,
-        1000,1500,2200,3300,4700,6800,
-    #    1200,1800,2700,3900,5600,8200,
-        10000,15000,22000,33000,47000,68000,
-    #    12000,18000,27000,39000,56000,82000,
-        100000,150000,220000,330000,470000,680000,
-    #    120000,180000,270000,390000,560000,820000,
-        1000000,
-        10000000,
-        ]
+
+    components: List[Component] = []
+
+    common_resistor_values: List[float] = [
+        1, 1.2, 1.5, 1.8, 2, 2.2, 2.4, 2.7, 3, 3.3, 3.6, 3.9, 4.3, 4.7, 5.1, 5.6, 6.2, 6.8, 7.5, 8.2, 9.1
+    ]
+
+    for exponent in range(6):
+        for value in common_resistor_values:
+            components.append(Resistor(value * (10 ** exponent)))
 
     # ############################################################################
     # Further configuration options
     #
     # Change the following options as you desire.
     # ############################################################################
-
-    # Enables drawing the resistor values on the other side of the sticker fold line
-    # as well, so that the finished resistor plastic bags are labeled on both sides.
-    draw_both_sides = False
 
     # Draws the line where the stickers should be folded.
     # Disable this if you don't like the line.
@@ -696,10 +597,6 @@ def main() -> None:
     # This is primarily a debugging option and should most likely not be enabled
     # for the actual printing.
     draw_outlines = False
-
-    # Draw minimal resistor color codes
-    # Just draw the color code bars, not the resistor artwork
-    draw_minimal = True
 
     # ############################################################################
     # PDF generation
@@ -712,7 +609,7 @@ def main() -> None:
     c = Canvas("ResistorLabels.pdf", pagesize=layout.pagesize)
 
     # Render the stickers
-    render_stickers(c, layout, resistor_values, draw_outlines, draw_center_line, draw_both_sides, draw_minimal)
+    render_stickers(c, layout, components, draw_outlines, draw_center_line)
 
     # Store canvas to PDF file
     c.save()
