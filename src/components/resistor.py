@@ -9,72 +9,22 @@ from src.components.component import Component
 
 class Resistor(Component):
     def __init__(self, ohms: float):
-        ohms_exp = 0
-        ohms_val = 0
+        self.units = "\u2126"
+
+        exp = 0
+        val = 0
 
         if ohms != 0:
             # Fixed-point value with 2 decimals precision
-            ohms_exp = math.floor(math.log10(ohms))
-            ohms_val = round(ohms / math.pow(10, ohms_exp - 2))
+            exp = math.floor(math.log10(ohms))
+            val = round(ohms / math.pow(10, exp - 2))
 
-            while ohms_val >= 1000:
-                ohms_exp += 1
-                ohms_val //= 10
+            while val >= 1000:
+                exp += 1
+                val //= 10
 
-        self.ohms_val = ohms_val
-        self.ohms_exp = ohms_exp
-
-        # print(self.ohms_val, self.ohms_exp, self.format_value(), self.get_value())
-
-    def get_value(self) -> float:
-        return self.ohms_val * math.pow(10, self.ohms_exp - 2)
-
-    def get_prefix(self) -> str:
-        if self.ohms_exp >= 12:
-            return "T"
-        if self.ohms_exp >= 9:
-            return "G"
-        if self.ohms_exp >= 6:
-            return "M"
-        if self.ohms_exp >= 3:
-            return "k"
-        if self.ohms_exp >= 0:
-            return ""
-        if self.ohms_exp >= -3:
-            return "m"
-        if self.ohms_exp >= -6:
-            return "\u03BC"
-        return "n"
-
-    def get_prefixed_number(self) -> str:
-        if self.ohms_exp % 3 == 0:
-            if self.ohms_val % 100 == 0:
-                return str(self.ohms_val // 100)
-            elif self.ohms_val % 10 == 0:
-                return str(self.ohms_val // 100) + "." + str((self.ohms_val % 100) // 10)
-            else:
-                return str(self.ohms_val // 100) + "." + str(self.ohms_val % 100)
-        elif self.ohms_exp % 3 == 1:
-            if self.ohms_val % 10 == 0:
-                return str(self.ohms_val // 10)
-            else:
-                return str(self.ohms_val // 10) + "." + str(self.ohms_val % 10)
-        else:
-            return str(self.ohms_val)
-
-    def format_value(self) -> str:
-        if self.ohms_exp < 0:
-            rendered_num = str(self.ohms_val)
-            while rendered_num[-1] == "0":
-                rendered_num = rendered_num[:-1]
-            if self.ohms_exp == -1:
-                return "0." + rendered_num
-            if self.ohms_exp == -2:
-                return "0.0" + rendered_num
-            if self.ohms_exp == -3:
-                return "0.00" + rendered_num
-
-        return self.get_prefixed_number() + " " + self.get_prefix() + "\u2126"
+        self.val = val
+        self.exp = exp
 
     def resistor_color_table(self, num: int) -> HexColor:
         return [
@@ -168,7 +118,7 @@ class Resistor(Component):
             num_codes: int,
     ) -> None:
 
-        if self.ohms_exp < num_codes - 4:
+        if self.exp < num_codes - 4:
             return
 
         border=0
@@ -176,7 +126,7 @@ class Resistor(Component):
         width_without_corner=width
         stripe_width=width/num_codes/2
 
-        if self.ohms_val == 0:
+        if self.val == 0:
             self.draw_resistor_stripe(c,
                                  x + border + corner + stripe_width / 2 + 2 * stripe_width * 2,
                                  y + border,
@@ -186,9 +136,9 @@ class Resistor(Component):
         else:
             for i in range(num_codes):
                 if i == num_codes - 1:
-                    stripe_value = self.ohms_exp + 2 - num_codes
+                    stripe_value = self.exp + 2 - num_codes
                 else:
-                    stripe_value = self.ohms_val
+                    stripe_value = self.val
                     for _ in range(2-i):
                         stripe_value //= 10
                     stripe_value %= 10
@@ -205,57 +155,57 @@ class Resistor(Component):
         c.setLineWidth(0.5)
 
     def get_3digit_code(self) -> str:
-        if self.ohms_val % 10 != 0:
+        if self.val % 10 != 0:
             return ""
 
-        if self.ohms_val == 0:
+        if self.val == 0:
             return "000"
 
-        digits = str(self.ohms_val // 10)
+        digits = str(self.val // 10)
 
-        if self.ohms_exp > 0:
-            multiplier = str(self.ohms_exp - 1)
+        if self.exp > 0:
+            multiplier = str(self.exp - 1)
             return digits + multiplier
 
-        if self.ohms_exp == 0:
+        if self.exp == 0:
             return digits[0] + "R" + digits[1]
 
-        if self.ohms_exp == -1:
+        if self.exp == -1:
             return "R" + digits
 
-        if self.ohms_exp == -2:
-            if self.ohms_val % 100 != 0:
+        if self.exp == -2:
+            if self.val % 100 != 0:
                 return ""
             return "R0" + digits[0]
 
         return ""
 
     def get_4digit_code(self) -> str:
-        digits = str(self.ohms_val)
+        digits = str(self.val)
 
-        if self.ohms_val == 0:
+        if self.val == 0:
             return "0000"
 
-        if self.ohms_exp > 1:
-            multiplier = str(self.ohms_exp - 2)
+        if self.exp > 1:
+            multiplier = str(self.exp - 2)
             return digits + multiplier
 
-        if self.ohms_exp == 1:
+        if self.exp == 1:
             return digits[0] + digits[1] + "R" + digits[2]
 
-        if self.ohms_exp == 0:
+        if self.exp == 0:
             return digits[0] + "R" + digits[1] + digits[2]
 
-        if self.ohms_exp == -1:
+        if self.exp == -1:
             return "R" + digits
 
-        if self.ohms_exp == -2:
-            if self.ohms_val % 10 != 0:
+        if self.exp == -2:
+            if self.val % 10 != 0:
                 return ""
             return "R0" + digits[0] + digits[1]
 
-        if self.ohms_exp == -3:
-            if self.ohms_val % 100 != 0:
+        if self.exp == -3:
+            if self.val % 100 != 0:
                 return ""
             return "R00" + digits[0]
 
@@ -289,16 +239,16 @@ class Resistor(Component):
             174: "24", 309: "48", 549: "72", 976: "96",
         }
 
-        if self.ohms_val not in eia98_coding_table:
+        if self.val not in eia98_coding_table:
             return ""
 
-        digits = eia98_coding_table[self.ohms_val]
+        digits = eia98_coding_table[self.val]
 
         multiplier_table = ["Z", "Y", "X", "A", "B", "C", "D", "E", "F"]
-        if not (0 <= self.ohms_exp+1 < len(multiplier_table)):
+        if not (0 <= self.exp+1 < len(multiplier_table)):
             return ""
 
-        multiplier = multiplier_table[self.ohms_exp+1]
+        multiplier = multiplier_table[self.exp+1]
 
         return digits + multiplier
 
