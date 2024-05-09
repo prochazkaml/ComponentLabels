@@ -24,7 +24,10 @@ class Component:
             return "m"
         if self.exp >= -6:
             return "\u03BC"
-        return "n"
+        if self.exp >= -9:
+            return "n"
+
+        return "p"
 
     def get_prefixed_number(self) -> str:
         if self.exp % 3 == 0:
