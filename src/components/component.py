@@ -46,16 +46,5 @@ class Component:
             return str(self.val)
 
     def format_value(self) -> str:
-        if self.exp < 0:
-            rendered_num = str(self.val)
-            while rendered_num[-1] == "0":
-                rendered_num = rendered_num[:-1]
-            if self.exp == -1:
-                return "0." + rendered_num
-            if self.exp == -2:
-                return "0.0" + rendered_num
-            if self.exp == -3:
-                return "0.00" + rendered_num
-
         return self.get_prefixed_number() + " " + self.get_prefix() + self.units
 
