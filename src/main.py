@@ -4,7 +4,8 @@ from reportlab.pdfbase.ttfonts import TTFont, TTFError
 
 from src.components.component import Component
 from src.components.resistor import Resistor
-from src.paperconfig import *
+from src.components.capacitor import Capacitor
+from src.paperconfig import PaperConfig, VYSOCINA
 from src.stickerrect import StickerRect
 
 import sys
@@ -108,12 +109,30 @@ def main() -> None:
     components: List[Component] = []
 
     common_resistor_values: List[float] = [
+        # E6
+        # 1, 1.5, 2.2, 3.3, 4.7, 6.8
+
+        # E12
+        # 1, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2
+
+        # Mostly complete E24. The bundle of resistors I bought did not come with some.
         1, 1.2, 1.5, 1.8, 2, 2.2, 2.4, 2.7, 3, 3.3, 3.6, 3.9, 4.3, 4.7, 5.1, 5.6, 6.2, 6.8, 7.5, 8.2, 9.1
+
+        # E24
+        # 1, 1.1, 1.2, 1.3, 1.5, 1.6, 1.8, 2, 2.2, 2.4, 2.7, 3, 3.3, 3.6, 3.9, 4.3, 4.7, 5.1, 5.6, 6.2, 6.8, 7.5, 8.2, 9.1
     ]
 
-    for exponent in range(6):
+    for exponent in range(6): # Ohms to 100kOhms (exclusive)
         for value in common_resistor_values:
             components.append(Resistor(value * (10 ** exponent)))
+
+    capacitor_values: List[float] = [ # in pF
+        2, 3, 5, 10, 15, 22, 30, 33, 47, 68, 75, 82, 100, 150, 220, 330, 470, 680,
+        1000, 1500, 2200, 3300, 4700, 6800, 10000, 15000, 33000, 47000, 68000, 100000
+    ]
+
+    for value in capacitor_values:
+        components.append(Capacitor(value * .000000000001))
 
     # ############################################################################
     # Further configuration options

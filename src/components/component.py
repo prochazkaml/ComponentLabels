@@ -120,9 +120,11 @@ class Component:
             width: float,
             height: float,
             num_codes: int,
+            exp_shift: int = 0
     ) -> None:
+        exp=self.exp + exp_shift
 
-        if self.exp < num_codes - 4:
+        if exp < num_codes - 4:
             return
 
         border=0
@@ -140,7 +142,7 @@ class Component:
         else:
             for i in range(num_codes):
                 if i == num_codes - 1:
-                    stripe_value = self.exp + 2 - num_codes
+                    stripe_value = exp + 2 - num_codes
                 else:
                     stripe_value = self.val
                     for _ in range(2-i):
