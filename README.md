@@ -1,3 +1,5 @@
+# TODO - documentation incomplete
+
 # ResistorLabels
 
 This script generates labels for resistor zip bags.
