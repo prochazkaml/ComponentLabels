@@ -5,7 +5,7 @@ from reportlab.lib.colors import black, HexColor, gray
 from reportlab.lib.units import inch
 
 from typing import List
-from math import pow
+from math import pow, sin, cos, pi
 
 class Component:
     def draw(self, c: Canvas, rect: StickerRect, draw_center_line: bool) -> None:
@@ -47,6 +47,16 @@ class Component:
             HexColor("#808080"),
             HexColor("#FFFFFF"),
         ][num]
+
+    def draw_arrow(self, c: Canvas, x: float, y: float, l: float, wl: float, a: float) -> None:
+        cx = x + l * cos(a)
+        cy = y + l * sin(a)
+
+        o = pi / 5
+
+        c.line(x, y, cx, cy)
+        c.line(cx, cy, cx + wl * cos(a + pi - o), cy + wl * sin(a + pi - o))
+        c.line(cx, cy, cx + wl * cos(a + pi + o), cy + wl * sin(a + pi + o))
 
     def draw_fancy_stripe(
         self,

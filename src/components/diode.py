@@ -3,7 +3,7 @@ from src.components.component import BasicComponent
 from reportlab.lib.colors import Color
 from reportlab.pdfgen.canvas import Canvas
 
-from math import sin, cos, atan, pi
+from math import atan
 
 class Diode(BasicComponent):
     def __init__(self, name: str, vf: str, ifwd: str, vr: str):
@@ -22,16 +22,6 @@ class Diode(BasicComponent):
         c.line(x - size / 3, y + size / 2, x + size / 3, y)
 
         c.line(x + size / 3, y - size / 2, x + size / 3, y + size / 2)
-
-    def draw_arrow(self, c: Canvas, x: float, y: float, l: float, wl: float, a: float) -> None:
-        cx = x + l * cos(a)
-        cy = y + l * sin(a)
-
-        o = pi / 5
-
-        c.line(x, y, cx, cy)
-        c.line(cx, cy, cx + wl * cos(a + pi - o), cy + wl * sin(a + pi - o))
-        c.line(cx, cy, cx + wl * cos(a + pi + o), cy + wl * sin(a + pi + o))
 
     def draw_icon(self, c: Canvas, x: float, y: float, size: float) -> None:
         self.draw_diode(c, x, y, size)

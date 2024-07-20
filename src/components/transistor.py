@@ -2,7 +2,7 @@ from src.components.component import BasicComponent
 
 from reportlab.pdfgen.canvas import Canvas
 
-from math import sin, cos, atan, pi
+from math import atan, pi, hypot
 
 class BipolarJunctionTransistor(BasicComponent):
     def __init__(self, name: str, cpin: str, bpin: str, epin: str, vbe: str, ic: str, vce: str):
@@ -14,13 +14,6 @@ class BipolarJunctionTransistor(BasicComponent):
         self.cpin = cpin
         self.bpin = bpin
         self.epin = epin
-
-    def draw_arrow(self, c: Canvas, x: float, y: float, w: float, s: float) -> None:
-        a = atan(1.5 / 2)
-        o = pi / 5
-
-        c.line(x, y, x + s * w * cos(a + o), y + w * sin(a + o))
-        c.line(x, y, x + s * w * cos(a - o), y + w * sin(a - o))
 
     def draw_transistor(self, c: Canvas, x: float, y: float, size: float) -> None:
         c.line(x - size / 1.5, y, x, y)
@@ -35,12 +28,12 @@ class BipolarJunctionTransistor(BasicComponent):
 class NPNBJT(BipolarJunctionTransistor):
     def draw_icon(self, c: Canvas, x: float, y: float, size: float) -> None:
         self.draw_transistor(c, x, y, size)
-        self.draw_arrow(c, x + size / 1.5, y - 3 * size / 4, size / 3, -1)
+        self.draw_arrow(c, x, y - size / 4, hypot(size / 1.5, size / 2), size / 3, -atan(1.5/2))
 
 class PNPBJT(BipolarJunctionTransistor):
     def draw_icon(self, c: Canvas, x: float, y: float, size: float) -> None:
         self.draw_transistor(c, x, y, size)
-        self.draw_arrow(c, x + size / 3, y + size / 2, size / 3, 1)
+        self.draw_arrow(c, x + size / 1.5, y + 3 * size / 4, size / 2, size / 3, atan(1.5/2) + pi)
 
 class FieldEffectTransistor(BasicComponent):
     def __init__(self, name: str, gpin: str, dpin: str, spin: str, vgs: str, id: str, vds: str):
@@ -70,20 +63,13 @@ class FieldEffectTransistor(BasicComponent):
         c.line(x, y - 4 * size / 8, x + 3 * size / 4, y - 4 * size / 8)
         c.line(x + 3 * size / 4, y, x + 3 * size / 4, y - size)
 
-    def draw_arrow(self, c: Canvas, x: float, y: float, w: float, s: float) -> None:
-        a = 0
-        o = pi / 5
-
-        c.line(x, y, x + s * w * cos(a + o), y + w * sin(a + o))
-        c.line(x, y, x + s * w * cos(a - o), y + w * sin(a - o))
-
 class NMOSFET(FieldEffectTransistor):
     def draw_icon(self, c: Canvas, x: float, y: float, size: float) -> None:
         self.draw_transistor(c, x, y, size)
-        self.draw_arrow(c, x, y, size / 3, 1)
+        self.draw_arrow(c, x + 3 * size / 4, y, 3 * size / 4, size / 3, pi)
 
 class PMOSFET(FieldEffectTransistor):
     def draw_icon(self, c: Canvas, x: float, y: float, size: float) -> None:
         self.draw_transistor(c, x, y, size)
-        self.draw_arrow(c, x + 3 * size / 4, y, size / 3, -1)
+        self.draw_arrow(c, x, y, 3 * size / 4, size / 3, 0)
 
