@@ -1,14 +1,18 @@
+from src.stickerrect import StickerRect
+
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.colors import black, HexColor, gray
-from src.stickerrect import StickerRect
+from reportlab.lib.units import inch
+
 from typing import List
+from math import pow
 
 class Component:
     def draw(self, c: Canvas, rect: StickerRect, draw_center_line: bool) -> None:
         raise Exception("called parent class")
 
     def get_value(self) -> float:
-        return self.val * math.pow(10, self.exp - 2)
+        return self.val * pow(10, self.exp - 2)
 
     def get_prefix(self) -> str:
         if self.exp >= 12:
@@ -129,7 +133,6 @@ class Component:
 
         border=0
         corner=0
-        width_without_corner=width
         stripe_width=width/num_codes/2
 
         if self.val == 0:
@@ -178,4 +181,43 @@ class Component:
 
     def format_value(self) -> str:
         return self.get_prefixed_number() + " " + self.get_prefix() + self.units
+
+class BasicComponent(Component):
+    def draw(self, c: Canvas, rect: StickerRect, draw_center_line: bool) -> None:
+        # Draw middle line
+        if draw_center_line:
+            c.setStrokeColor(black, 0.25)
+            c.setLineWidth(0.7)
+            c.line(rect.left,
+                   rect.bottom + rect.height/2,
+                   rect.left + rect.width,
+                   rect.bottom + rect.height/2)
+
+        # Draw resistor value
+        print("Generating sticker '{}' ({})".format(self.value, self.type))
+
+        value_font_size = 0.25 * inch
+        small_font_size = 0.08 * inch
+
+        text_x = rect.left + rect.width/2 
+        text_bottom = rect.bottom + rect.height/4 - value_font_size/3
+        c.setFont('main', value_font_size * 1)
+        c.drawCentredString(text_x, text_bottom, self.value)
+        c.drawCentredString(text_x, text_bottom+rect.height/2, self.value)
+
+        c.setFont('main', small_font_size * 1.35)
+        small_text_x = rect.left + 5 * rect.width / 6
+        small_text_bottom = rect.bottom + rect.height/4 - small_font_size/3
+
+        c.setStrokeColor(black, 1)
+        c.setLineWidth(2)
+        c.setLineCap(1)
+        
+        for i in (0,rect.height/2):
+            c.drawCentredString(small_text_x, i + small_text_bottom + rect.height / 8, self.str1)
+            c.drawCentredString(small_text_x, i + small_text_bottom, self.str2)
+            c.drawCentredString(small_text_x, i + small_text_bottom - rect.height / 8, self.str3)
+            self.draw_icon(c, rect.left + rect.width / 6, rect.bottom + rect.height/4 + i, rect.height / 6)
+        
+        c.setLineCap(0)
 

@@ -1,10 +1,11 @@
+from src.stickerrect import StickerRect
+from src.components.component import Component
+
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.colors import black, toColor
 from reportlab.lib.units import inch
-import math
 
-from src.stickerrect import StickerRect
-from src.components.component import Component
+import math
 
 class Resistor(Component):
     def __init__(self, ohms: float):
@@ -138,14 +139,12 @@ class Resistor(Component):
 
         value_font_size = 0.25 * inch
         smd_font_size = 0.08 * inch
-        space_between = 5
 
         value_string = self.format_value()
-        value_width = c.stringWidth(value_string, 'Arial Bold', value_font_size * 1.35)
 
         text_middle = rect.left + rect.width/2
         text_bottom = rect.bottom + rect.height/4 - value_font_size/5
-        c.setFont('Arial Bold', value_font_size * 1)
+        c.setFont('main', value_font_size * 1)
         c.drawCentredString(text_middle, text_bottom, value_string)
         c.drawCentredString(text_middle, text_bottom+rect.height/2, value_string)
 
@@ -160,7 +159,7 @@ class Resistor(Component):
                                         rect.width/3, rect.height*7/16,
                                         stripes)
 
-        c.setFont('Arial Bold', smd_font_size * 1.35)
+        c.setFont('main', smd_font_size * 1.35)
         for i in (0,rect.height/2):
             c.drawString(rect.left + rect.width/3, rect.bottom +
                         rect.height/13+i, self.get_3digit_code())

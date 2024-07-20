@@ -1,56 +1,25 @@
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont, TTFError
+from reportlab.pdfbase.ttfonts import TTFont
 
 from src.components.component import Component
 from src.components.resistor import Resistor
 from src.components.capacitor import Capacitor
+from src.components.nut import SquareNut, HexNut
+from src.components.screw import RecessedHeadScrew, RoundHeadScrew
+from src.components.transistor import NPNBJT, PNPBJT, NMOSFET, PMOSFET
 from src.paperconfig import PaperConfig, VYSOCINA
 from src.stickerrect import StickerRect
 
-import sys
-
 from typing import List
-
-def load_font(font_name: str) -> None:
-    pdfmetrics.registerFont(TTFont('Arial Bold', font_name))
-    print("Using font '{}' ...".format(font_name))
-
-
-if "--noroboto" not in sys.argv:
-    try:
-        load_font('Roboto-Bold.ttf')
-    except TTFError as e:
-        print("Error: {}".format(e))
-        exit(1)
-
-else:
-    for font_name in ['ArialBd.ttf', 'Arial_Bold.ttf']:
-        try:
-            load_font(font_name)
-            break
-        except TTFError:
-            pass
-    else:
-        print("Error: Unable to load font 'Arial Bold'.")
-        print("If you are on Ubuntu, you can install it with:")
-        print("    sudo apt install ttf-mscorefonts-installer")
-        print("Alternatively, use the 'Roboto' font by invoking this script with")
-        print("the '--roboto' flag.")
-        print("On Mac OS the '--roboto' flag is mandatory because this script currently")
-        print("does not support Arial on Mac OS.")
-        exit(1)
-
 
 def begin_page(c: Canvas, layout: PaperConfig, draw_outlines: bool) -> None:
     # Draw the outlines of the stickers. Not recommended for the actual print.
     if draw_outlines:
         render_outlines(c, layout)
 
-
 def end_page(c: Canvas) -> None:
     c.showPage()
-
 
 def render_stickers(
     c: Canvas,
@@ -81,7 +50,6 @@ def render_stickers(
     # End the page one final time
     end_page(c)
 
-
 def render_outlines(c: Canvas, layout: PaperConfig) -> None:
     for row in range(layout.num_stickers_vertical):
         for column in range(layout.num_stickers_horizontal):
@@ -90,8 +58,8 @@ def render_outlines(c: Canvas, layout: PaperConfig) -> None:
                 c.setLineWidth(0)
                 c.roundRect(rect.left, rect.bottom, rect.width, rect.height, rect.corner)
 
-
 def main() -> None:
+    pdfmetrics.registerFont(TTFont('main', 'Roboto-Bold.ttf'))
 
     # ############################################################################
     # Select the correct type of paper you want to print on.
@@ -122,17 +90,37 @@ def main() -> None:
         # 1, 1.1, 1.2, 1.3, 1.5, 1.6, 1.8, 2, 2.2, 2.4, 2.7, 3, 3.3, 3.6, 3.9, 4.3, 4.7, 5.1, 5.6, 6.2, 6.8, 7.5, 8.2, 9.1
     ]
 
-    for exponent in range(6): # Ohms to 100kOhms (exclusive)
-        for value in common_resistor_values:
-            components.append(Resistor(value * (10 ** exponent)))
+    # for exponent in range(6): # Ohms to 100kOhms (exclusive)
+    #     for value in common_resistor_values:
+    #         components.append(Resistor(value * (10 ** exponent)))
+
+    # resistor_values: List[float] = [
+    #     3300000, 4700000, 5600000, 10000000
+    # ]
+    #
+    # for value in resistor_values:
+    #     components.append(Resistor(value))
+
+    # capacitor_values: List[float] = [ # in pF
+    #     2, 2.2, 3, 5, 10, 15, 22, 30, 33, 47, 68, 75, 82, 100, 150, 220, 330, 470, 680,
+    #     1000, 1500, 2200, 3300, 4700, 6800, 10000, 15000, 33000, 47000, 68000, 100000
+    # ]
 
     capacitor_values: List[float] = [ # in pF
-        2, 3, 5, 10, 15, 22, 30, 33, 47, 68, 75, 82, 100, 150, 220, 330, 470, 680,
-        1000, 1500, 2200, 3300, 4700, 6800, 10000, 15000, 33000, 47000, 68000, 100000
+        2.2
     ]
 
     for value in capacitor_values:
         components.append(Capacitor(value * .000000000001))
+
+    components.append(HexNut("test", 2.4, 5.5, 6.5))
+    components.append(SquareNut("test", 2.4, 5.5, 6.5))
+    components.append(RoundHeadScrew("test", 2.4, 5.5, 6.5))
+    components.append(RecessedHeadScrew("test", 2.4, 5.5, 6.5))
+    components.append(NPNBJT("test", 1, 2, 3, 4, 5, 6))
+    components.append(PNPBJT("test", 1, 2, 3, 4, 5, 6))
+    components.append(NMOSFET("test", 1, 2, 3, 4, 5, 6))
+    components.append(PMOSFET("test", 1, 2, 3, 4, 5, 6))
 
     # ############################################################################
     # Further configuration options
