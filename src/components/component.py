@@ -206,7 +206,7 @@ class BasicComponent(Component):
         # Draw resistor value
         print("Generating sticker '{}' ({})".format(self.value, self.type))
 
-        value_font_size = 0.25 * inch
+        value_font_size = 0.20 * inch
         small_font_size = 0.08 * inch
 
         text_x = rect.left + rect.width/2 
@@ -215,7 +215,6 @@ class BasicComponent(Component):
         c.drawCentredString(text_x, text_bottom, self.value)
         c.drawCentredString(text_x, text_bottom+rect.height/2, self.value)
 
-        c.setFont('main', small_font_size * 1.35)
         small_text_x = rect.left + 5 * rect.width / 6
         small_text_bottom = rect.bottom + rect.height/4 - small_font_size/3
 
@@ -224,6 +223,7 @@ class BasicComponent(Component):
         c.setLineCap(1)
         
         for i in (0,rect.height/2):
+            c.setFont('main', small_font_size * 1.35)
             c.drawCentredString(small_text_x, i + small_text_bottom + rect.height / 8, self.str1)
             c.drawCentredString(small_text_x, i + small_text_bottom, self.str2)
             c.drawCentredString(small_text_x, i + small_text_bottom - rect.height / 8, self.str3)

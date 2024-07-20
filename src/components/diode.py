@@ -34,6 +34,13 @@ class SchottkyDiode(Diode):
         c.line(x + size / 3, y + size / 2, x + size / 3 + size / 6, y + size / 2)
 
 class ZenerDiode(Diode):
+    def __init__(self, name: str, vr: str, ir: str, vf: str):
+        self.value = name
+        self.type = "diode"
+        self.str1 = "Vr = {}".format(vr)
+        self.str2 = "Ir = {}".format(ir)
+        self.str3 = "Vf = {}".format(vf)
+
     def draw_icon(self, c: Canvas, x: float, y: float, size: float) -> None:
         self.draw_diode(c, x, y, size)
 
