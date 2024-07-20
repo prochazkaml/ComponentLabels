@@ -5,10 +5,10 @@ from src.components.component import BasicComponent
 from math import sin, cos, pi
 
 class Nut(BasicComponent):
-    def __init__(self, name: str, m: str, s: str, d: str):
+    def __init__(self, name: str, h: str, s: str, d: str):
         self.value = name
         self.type = "nut"
-        self.str1 = "m = {}".format(m)
+        self.str1 = "h = {}".format(h)
         self.str2 = "s = {}".format(s)
         self.str3 = "d = {}".format(d)
 

@@ -92,41 +92,74 @@ def main() -> None:
         # 1, 1.1, 1.2, 1.3, 1.5, 1.6, 1.8, 2, 2.2, 2.4, 2.7, 3, 3.3, 3.6, 3.9, 4.3, 4.7, 5.1, 5.6, 6.2, 6.8, 7.5, 8.2, 9.1
     ]
 
-    # for exponent in range(6): # Ohms to 100kOhms (exclusive)
-    #     for value in common_resistor_values:
-    #         components.append(Resistor(value * (10 ** exponent)))
+    for exponent in range(6): # Ohms to 100kOhms (exclusive)
+        for value in common_resistor_values:
+            components.append(Resistor(value * (10 ** exponent)))
 
-    # resistor_values: List[float] = [
-    #     3300000, 4700000, 5600000, 10000000
-    # ]
-    #
-    # for value in resistor_values:
-    #     components.append(Resistor(value))
-
-    # capacitor_values: List[float] = [ # in pF
-    #     2, 2.2, 3, 5, 10, 15, 22, 30, 33, 47, 68, 75, 82, 100, 150, 220, 330, 470, 680,
-    #     1000, 1500, 2200, 3300, 4700, 6800, 10000, 15000, 33000, 47000, 68000, 100000
-    # ]
+    resistor_values: List[float] = [
+        3300000, 4700000, 5600000, 10000000
+    ]
+    
+    for value in resistor_values:
+        components.append(Resistor(value))
 
     capacitor_values: List[float] = [ # in pF
-        2.2
+        2, 2.2, 3, 5, 10, 15, 22, 30, 33, 47, 68, 75, 82, 100, 150, 220, 330, 470, 680,
+        1000, 1500, 2200, 3300, 4700, 6800, 10000, 15000, 33000, 47000, 68000, 100000
     ]
 
     for value in capacitor_values:
         components.append(Capacitor(value * .000000000001))
 
-    components.append(HexNut("test", 2.4, 5.5, 6.5))
-    components.append(SquareNut("test", 2.4, 5.5, 6.5))
-    components.append(RoundHeadScrew("test", 2.4, 5.5, 6.5))
-    components.append(RecessedHeadScrew("test", 2.4, 5.5, 6.5))
-    components.append(NPNBJT("test", 1, 2, 3, 4, 5, 6))
-    components.append(PNPBJT("test", 1, 2, 3, 4, 5, 6))
-    components.append(NMOSFET("test", 1, 2, 3, 4, 5, 6))
-    components.append(PMOSFET("test", 1, 2, 3, 4, 5, 6))
-    components.append(Diode("test", 1, 2, 3))
-    components.append(SchottkyDiode("test", 1, 2, 3))
-    components.append(ZenerDiode("test", 1, 2, 3))
-    components.append(LED("test", 1, 2, 3, HexColor("#FF0000")))
+    components.append(RoundHeadScrew("M5", "10 mm", "4.2 mm", "30 mm"))
+    components.append(RoundHeadScrew("M3", "6 mm", "2.6 mm", "20 mm"))
+    components.append(RoundHeadScrew("M3", "6 mm", "2.6 mm", "16 mm"))
+    components.append(RecessedHeadScrew("M3", "5.6 mm", "2 mm", "7 mm"))
+    components.append(HexNut("M5", "4 mm", "8 mm", "9 mm"))
+    components.append(HexNut("M3", "2.2 mm", "5.5 mm", "6.3 mm"))
+    components.append(SquareNut("M5", "3 mm", "8 mm", "11.3 mm"))
+    
+    components.append(NPNBJT("2N2222", 3, 2, 1, "0.6 (6) V", "600 mA", "40 V"))
+    components.append(NPNBJT("2N3904", 3, 2, 1, "0.65 (6) V", "200 mA", "40 V"))
+    components.append(PNPBJT("2N3906", 3, 2, 1, "-0.65 (-5) V", "-200 mA", "-40 V"))
+    components.append(PNPBJT("2N5401", 3, 2, 1, "-1 (-5) V", "-600 mA", "-150 V"))
+    components.append(NPNBJT("2N5551", 3, 2, 1, "1 (6) V", "600 mA", "160 V"))
+    components.append(PNPBJT("A1015", 2, 3, 1, "-1.1 (-5) V", "-150 mA", "-50 V"))
+    components.append(NPNBJT("C1815", 2, 3, 1, "1 (5) V", "150 mA", "50 V"))
+    components.append(NPNBJT("C945", 2, 3, 1, "1 (5) V", "150 mA", "50 V"))
+    
+    components.append(NPNBJT("S8050", 3, 2, 1, "1 (6) V", "1.5 A", "25 V"))
+    components.append(PNPBJT("S8550", 3, 2, 1, "-0.66 (-6) V", "-1.5 A", "-25 V"))
+    components.append(PNPBJT("S9012", 3, 2, 1, "-0.66 (-5) V", "-500 mA", "-20 V"))
+    components.append(NPNBJT("S9013", 3, 2, 1, "1.2 (5) V", "500 mA", "25 V"))
+    components.append(NPNBJT("S9014", 3, 2, 1, "0.85 (5) V", "500 mA", "45 V"))
+    components.append(PNPBJT("S9015", 3, 2, 1, "-1 (-5) V", "-100 mA", "-45 V"))
+    components.append(PNPBJT("BC327", 1, 2, 3, "-1.2 (-5) V", "-800 mA", "-45 V"))
+    components.append(NPNBJT("BC337", 1, 2, 3, "1.2 (5) V", "800 mA", "45 V"))
+    
+    components.append(NPNBJT("BC517", 1, 2, 3, "1.4 (10) V", "1.2 A", "30 V"))
+    components.append(NPNBJT("BC547", 1, 2, 3, "0.9 (6) V", "100 mA", "45 V"))
+    components.append(NPNBJT("BC548", 1, 2, 3, "0.9 (5) V", "100 mA", "30 V"))
+    components.append(NPNBJT("BC549", 1, 2, 3, "0.9 (5) V", "100 mA", "30 V"))
+    components.append(NPNBJT("BC550", 1, 2, 3, "0.9 (5) V", "100 mA", "45 V"))
+    components.append(PNPBJT("BC556", 1, 2, 3, "-1 (-5) V", "-100 mA", "-65 V"))
+    components.append(PNPBJT("BC557", 1, 2, 3, "-1 (-5) V", "-100 mA", "-45 V"))
+    components.append(PNPBJT("BC588", 1, 2, 3, "-1 (-5) V", "-100 mA", "-30 V"))
+    
+    components.append(NMOSFET("IRF520", 1, 2, 3, "2..4 V", "6.5 A", "100 V"))
+    components.append(PMOSFET("IRF9520", 1, 2, 3, "-2..4 V", "-4.8 A", "-100 V"))
+    
+    components.append(Diode("1N4148", "1 V", "300 mA", "75 V"))
+    components.append(Diode("1N4007", "1.1 V", "1 A", "1 kV"))
+    components.append(SchottkyDiode("PMEG3050", "360 mV", "5 A", "30 V"))
+    components.append(ZenerDiode("ZPD3V6", "3.4-3.8 V", "5 mA", "1 V"))
+
+    components.append(LED("5 mm", "1.2 V", "20 mA", "940 nm", HexColor("#800000")))
+    components.append(LED("5 mm", "3.0-3.2 V", "20 mA", "* nm", HexColor("#FFFFFF")))
+    components.append(LED("5 mm", "1.9-2.1 V", "20 mA", "620-625 nm", HexColor("#FF0000")))
+    components.append(LED("5 mm", "1.9-2.1 V", "20 mA", "588-590 nm", HexColor("#FFFF00")))
+    components.append(LED("5 mm", "2.1-3.0 V", "20 mA", "567-570 nm", HexColor("#00FF00")))
+    components.append(LED("5 mm", "3.0-3.2 V", "20 mA", "455-465 nm", HexColor("#0000FF")))
 
     # ############################################################################
     # Further configuration options
