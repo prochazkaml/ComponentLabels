@@ -1,3 +1,4 @@
+from reportlab.lib.colors import HexColor
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -8,6 +9,7 @@ from src.components.capacitor import Capacitor
 from src.components.nut import SquareNut, HexNut
 from src.components.screw import RecessedHeadScrew, RoundHeadScrew
 from src.components.transistor import NPNBJT, PNPBJT, NMOSFET, PMOSFET
+from src.components.diode import Diode, SchottkyDiode, ZenerDiode, LED
 from src.paperconfig import PaperConfig, VYSOCINA
 from src.stickerrect import StickerRect
 
@@ -121,6 +123,10 @@ def main() -> None:
     components.append(PNPBJT("test", 1, 2, 3, 4, 5, 6))
     components.append(NMOSFET("test", 1, 2, 3, 4, 5, 6))
     components.append(PMOSFET("test", 1, 2, 3, 4, 5, 6))
+    components.append(Diode("test", 1, 2, 3))
+    components.append(SchottkyDiode("test", 1, 2, 3))
+    components.append(ZenerDiode("test", 1, 2, 3))
+    components.append(LED("test", 1, 2, 3, HexColor("#FF0000")))
 
     # ############################################################################
     # Further configuration options
