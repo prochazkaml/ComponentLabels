@@ -1,42 +1,39 @@
-# TODO - documentation incomplete
+# ComponentLabels
 
-# ResistorLabels
+This script generates labels for zip bags with all sorts of electronic or mechanical components.
 
-This script generates labels for resistor zip bags.
-
-It is meant for AVERY 5260 or AVERY L7157 labels and 7x10cm (3"x4") zip bags.
-
-The generated labels include:
-
--   Resistor value
--   4- and 5-band color codes
--   3- and 4-digit smd codes
--   EIA-96 smd code
+It is primarily meant for [these](https://www.obalyvysocina.cz/produkty/samolepici-etikety) labels (70x25.4 mm) and 8x12 cm zip bags. However, the generator script also supports AVERY 5260 or AVERY L7157 labels.
 
 <img src="Example.png">
 
+## Supported components
+
+- Resistors (+ 3 & 4 digit SMD code, EIA-96 code and 3 & 4 band color codes)
+- Capacitors (+ 3 digit SMD code, EIA-198 code and 3 band color code (yes, those appear to actually exist))
+- Diodes & Schottky diodes (+ forward voltage/current, reverse voltage)
+- Zener diodes (+ reverse voltage/current, forward voltage)
+- LEDs (+ forward voltage/current, wavelength)
+- PNP/NPN BJT (+ base-emittor voltage, collector-emittor voltage/current)
+- P/N-channel MOSFET (+ gate-source voltage, drain current, drain-source voltage)
+- Square/Hexagonal nuts (+ thickness, width and diameter)
+- Recessed/Round-head screws (+ head width, head height and screw length)
+
 # Usage
 
--   Install python3
--   Install the python3 library `reportlab`. This library is used to do the actual PDF generation.
--   Add your own required resistor values in `main()` of `LabelGenerator.py`.
--   If using Avery L7157, change the `layout` value in `main()` to `AVERY_L7157`.
--   Run the script `LabelGenerator.py`!
+- Install python3
+- Install the python3 library `reportlab`. This library is used to do the actual PDF generation.
+- Add your own required resistor values in `main()` of `LabelGenerator.py`.
+- If using Avery L7157 or 5260, change the `layout` value in `main()` to `AVERY_L7157` or `AVERY_5260`.
+- Run the script `LabelGenerator.py`!
 
 It will now generate a `ResistorLabels.pdf` that can be used to print onto AVERY 5260/L7157.
 
 # More Details
 
-This is forked from https://github.com/Finomnis/ResistorLabels
+This is forked from https://github.com/securelyfitz/ResistorLabels, which is in turn a fork of https://github.com/Finomnis/ResistorLabels
 
-At first, I tried to make it a clean, PR'able option, but I got lazy halfway through.
+The original is based on an idea from Zach Poff. I liked the design of securelyfitz's forked labels, I just needed to implement more than resistors.
 
-I wanted just the color codes, big and bold, on both sides of the label. I used 4x4" 4 mil bags i had lying around, which fit nicely into a box I already had.
-
-Labels are made to fold over the edge of the bag. They're repeated, not flipped, so the opening is always on the same side (left for me) and when you flip through the box, the labels always look right side up.
-
-The original in turn is based on an idea from Zach Poff.
-
-For more details on how to use these labels, visit his website:
+For more details on how to use these labels, visit Zach's website:
 
 https://www.zachpoff.com/resources/quick-easy-and-cheap-resistor-storage/
