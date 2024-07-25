@@ -216,7 +216,16 @@ class BasicComponent(Component):
         c.drawCentredString(text_x, text_bottom+rect.height/2, self.value)
 
         small_text_x = rect.left + 5 * rect.width / 6
-        small_text_bottom = rect.bottom + rect.height/4 - small_font_size/3
+        small_text_bottom = rect.bottom + rect.height/8 + rect.height/4 - small_font_size/3
+
+        if self.str1 == None:
+            small_text_bottom -= rect.height / 16
+
+        if self.str2 == None:
+            small_text_bottom -= rect.height / 16
+
+        if self.str3 == None:
+            small_text_bottom -= rect.height / 16
 
         c.setStrokeColor(black, 1)
         c.setLineWidth(2)
@@ -224,9 +233,21 @@ class BasicComponent(Component):
         
         for i in (0,rect.height/2):
             c.setFont('main', small_font_size * 1.35)
-            c.drawCentredString(small_text_x, i + small_text_bottom + rect.height / 8, self.str1)
-            c.drawCentredString(small_text_x, i + small_text_bottom, self.str2)
-            c.drawCentredString(small_text_x, i + small_text_bottom - rect.height / 8, self.str3)
+
+            bottom = small_text_bottom
+            
+            if self.str1 != None:
+                c.drawCentredString(small_text_x, i + bottom, self.str1)
+                bottom -= rect.height / 8
+
+            if self.str2 != None:
+                c.drawCentredString(small_text_x, i + bottom, self.str2)
+                bottom -= rect.height / 8
+            
+            if self.str3 != None:
+                c.drawCentredString(small_text_x, i + bottom, self.str3)
+                bottom -= rect.height / 8
+
             self.draw_icon(c, rect.left + rect.width / 6, rect.bottom + rect.height/4 + i, rect.height / 6)
         
         c.setLineCap(0)

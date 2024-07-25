@@ -8,15 +8,17 @@ It is primarily meant for [these](https://www.obalyvysocina.cz/produkty/samolepi
 
 ## Supported components
 
-- Resistors (+ 3 & 4 digit SMD code, EIA-96 code and 3 & 4 band color codes)
-- Capacitors (+ 3 digit SMD code, EIA-198 code and 3 band color code (yes, those appear to actually exist))
-- Diodes & Schottky diodes (+ forward voltage/current, reverse voltage)
-- Zener diodes (+ reverse voltage/current, forward voltage)
-- LEDs (+ forward voltage/current, wavelength)
-- PNP/NPN BJT (+ base-emittor voltage, collector-emittor voltage/current)
-- P/N-channel MOSFET (+ gate-source voltage, drain current, drain-source voltage)
-- Square/Hexagonal nuts (+ thickness, width and diameter)
-- Recessed/Round-head screws (+ head width, head height and screw length)
+- Resistors (resistance, 3 & 4 digit SMD code, EIA-96 code and 3 & 4 band color codes)
+- Capacitors (capacitance, 3 digit SMD code, EIA-198 code and 3 band color code (yes, those appear to actually exist))
+- Diodes & Schottky diodes (name, forward voltage/current, reverse voltage)
+- Zener diodes (name, reverse voltage/current, forward voltage)
+- LEDs (diameter/name, forward voltage/current, wavelength)
+- PNP/NPN BJT (name, base-emittor voltage, collector-emittor voltage/current)
+- P/N-channel MOSFET (name, gate-source voltage, drain current, drain-source voltage)
+- Square/Hexagonal nuts (thread type, thickness, width and diameter)
+- Recessed/Round-head screws (thread type, head width, head height and screw length)
+- Threaded inserts for 3D prints (thread type, diameter and length)
+- Compression/Extension springs (diameter and length)
 
 # Usage
 

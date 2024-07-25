@@ -6,11 +6,13 @@ from reportlab.pdfbase.ttfonts import TTFont
 from src.components.component import Component
 from src.components.resistor import Resistor
 from src.components.capacitor import Capacitor
-from src.components.nut import SquareNut, HexNut
-from src.components.screw import RecessedHeadScrew, RoundHeadScrew
 from src.components.transistor import NPNBJT, PNPBJT, NMOSFET, PMOSFET
 from src.components.diode import Diode, SchottkyDiode, ZenerDiode, LED
-from src.paperconfig import PaperConfig, VYSOCINA
+from src.components.nut import SquareNut, HexNut
+from src.components.screw import RecessedHeadScrew, RoundHeadScrew
+from src.components.threadedinsert import ThreadedInsert
+from src.components.spring import CompressionSpring, ExtensionSpring
+from src.paperconfig import PaperConfig, AVERY_5260, AVERY_L7157, VYSOCINA
 from src.stickerrect import StickerRect
 
 from typing import List
@@ -112,13 +114,50 @@ def main() -> None:
         components.append(Capacitor(value * .000000000001))
 
     components.append(RoundHeadScrew("M5", "10 mm", "4.2 mm", "30 mm"))
-    components.append(RoundHeadScrew("M3", "6 mm", "2.6 mm", "20 mm"))
+    components.append(RoundHeadScrew("M3", "6 mm", "2.6 mm", "6 mm"))
     components.append(RoundHeadScrew("M3", "6 mm", "2.6 mm", "16 mm"))
+    components.append(RoundHeadScrew("M3", "6 mm", "2.6 mm", "20 mm"))
+
     components.append(RecessedHeadScrew("M3", "5.6 mm", "2 mm", "7 mm"))
+    
     components.append(HexNut("M5", "4 mm", "8 mm", "9 mm"))
     components.append(HexNut("M3", "2.2 mm", "5.5 mm", "6.3 mm"))
+
     components.append(SquareNut("M5", "3 mm", "8 mm", "11.3 mm"))
     
+    components.append(ThreadedInsert("M2", "3.5 mm", "3 mm"))
+    components.append(ThreadedInsert("M2", "3.5 mm", "4 mm"))
+    components.append(ThreadedInsert("M2", "3.5 mm", "5 mm"))
+    components.append(ThreadedInsert("M2.5", "3.5 mm", "3 mm"))
+    components.append(ThreadedInsert("M2.5", "3.5 mm", "4 mm"))
+    components.append(ThreadedInsert("M2.5", "3.5 mm", "5 mm"))
+    components.append(ThreadedInsert("M3", "4.5 mm", "3 mm"))
+    components.append(ThreadedInsert("M3", "4.5 mm", "4 mm"))
+    components.append(ThreadedInsert("M3", "5 mm", "4 mm"))
+    components.append(ThreadedInsert("M3", "5 mm", "5 mm"))
+
+    components.append(ExtensionSpring("5 mm", "20.5 mm"))
+    components.append(ExtensionSpring("5.5 mm", "25.5 mm"))
+    components.append(ExtensionSpring("6.5 mm", "22 mm"))
+    components.append(ExtensionSpring("8.5 mm", "47 mm"))
+    components.append(ExtensionSpring("7 mm", "51 mm"))
+    components.append(ExtensionSpring("7 mm", "38 mm"))
+    components.append(ExtensionSpring("8.5 mm", "36.5 mm"))
+    components.append(ExtensionSpring("8 mm", "28.5 mm"))
+    components.append(ExtensionSpring("8 mm", "31.5 mm"))
+    components.append(ExtensionSpring("8 mm", "44.5 mm"))
+    components.append(ExtensionSpring("4 mm", "79.5 mm"))
+    components.append(ExtensionSpring("4.5 mm", "44.5 mm"))
+
+    components.append(CompressionSpring("7 mm", "12.5 mm"))
+    components.append(CompressionSpring("6.5 mm", "10 mm"))
+    components.append(CompressionSpring("7 mm", "19 mm"))
+    components.append(CompressionSpring("5.5 mm", "38 mm"))
+    components.append(CompressionSpring("9.5 mm", "16 mm"))
+    components.append(CompressionSpring("9.5 mm", "19 mm"))
+    components.append(CompressionSpring("9 mm", "35 mm"))
+    components.append(CompressionSpring("5.5 mm", "17 mm"))
+
     components.append(NPNBJT("2N2222", 3, 2, 1, "0.6 (6) V", "600 mA", "40 V"))
     components.append(NPNBJT("2N3904", 3, 2, 1, "0.65 (6) V", "200 mA", "40 V"))
     components.append(PNPBJT("2N3906", 3, 2, 1, "-0.65 (-5) V", "-200 mA", "-40 V"))
@@ -161,6 +200,12 @@ def main() -> None:
     components.append(LED("5 mm", "2.1-3.0 V", "20 mA", "567-570 nm", HexColor("#00FF00")))
     components.append(LED("5 mm", "3.0-3.2 V", "20 mA", "455-465 nm", HexColor("#0000FF")))
 
+    components.append(LED("3 mm", "3.0-3.2 V", "20 mA", "* nm", HexColor("#FFFFFF")))
+    components.append(LED("3 mm", "1.9-2.1 V", "20 mA", "620-625 nm", HexColor("#FF0000")))
+    components.append(LED("3 mm", "1.9-2.1 V", "20 mA", "588-590 nm", HexColor("#FFFF00")))
+    components.append(LED("3 mm", "2.1-3.0 V", "20 mA", "567-570 nm", HexColor("#00FF00")))
+    components.append(LED("3 mm", "3.0-3.2 V", "20 mA", "455-465 nm", HexColor("#0000FF")))
+    
     # ############################################################################
     # Further configuration options
     #
