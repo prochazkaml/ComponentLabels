@@ -4,7 +4,7 @@ This script generates labels for zip bags with all sorts of electronic or mechan
 
 It is primarily meant for [these](https://www.obalyvysocina.cz/produkty/samolepici-etikety) labels (70x25.4 mm) and [these](https://www.obalyvysocina.cz/produkty/rychlouzaviraci-sacek-extra-pevny#rychlouzaviraci-sacek-silny8x12) 8x12 cm zip bags. However, the generator script also supports AVERY 5260 or AVERY L7157 labels.
 
-<img src="Example.png">
+![Some examples of ComponentLabels](https://github.com/user-attachments/assets/97d1cfc7-5ef2-4d29-b490-5f422465625b)
 
 ## Supported components
 
