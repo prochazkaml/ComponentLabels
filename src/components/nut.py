@@ -28,3 +28,15 @@ class SquareNut(Nut):
 
         c.circle(x, y, size / 2)
 
+class Washer(BasicComponent):
+    def __init__(self, name: str, h: str, s: str):
+        self.value = name
+        self.type = "washer"
+        self.str1 = "h = {}".format(h)
+        self.str2 = "s = {}".format(s)
+        self.str3 = None
+    
+    def draw_icon(self, c: Canvas, x: float, y: float, size: float) -> None:
+        c.circle(x, y, size)
+        c.circle(x, y, size / 2)
+
