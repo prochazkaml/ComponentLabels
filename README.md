@@ -16,7 +16,8 @@ It is primarily meant for [these](https://www.obalyvysocina.cz/produkty/samolepi
 - PNP/NPN BJT (name, base-emittor voltage, collector-emittor voltage/current)
 - P/N-channel MOSFET (name, gate-source voltage, drain current, drain-source voltage)
 - Square/Hexagonal nuts (thread type, thickness, width and diameter)
-- Recessed/Round-head screws (thread type, head width, head height and screw length)
+- Washers (thread type, thickness, diameter)
+- Recessed/Round-head/Flat-head screws (thread type, head width, head height and screw length)
 - Threaded inserts for 3D prints (thread type, diameter and length)
 - Compression/Extension springs (diameter and length)
 
