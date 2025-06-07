@@ -3,7 +3,7 @@ from src.components.component import BasicComponent
 from reportlab.pdfgen.canvas import Canvas
 
 class Screw(BasicComponent):
-    def __init__(self, name: str, a: str, h: str, l: str = None):
+    def __init__(self, name: str, a: str, h: str, l: str | None = None):
         self.value = name
         self.type = "screw"
         self.str1 = "a = {}".format(a)

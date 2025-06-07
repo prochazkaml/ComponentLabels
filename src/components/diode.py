@@ -1,6 +1,6 @@
 from src.components.component import BasicComponent
 
-from reportlab.lib.colors import Color
+from reportlab.lib.colors import Color, black
 from reportlab.pdfgen.canvas import Canvas
 
 from math import atan
@@ -57,7 +57,7 @@ class LED(Diode):
         self.str3 = "λ = {}".format(wl)
 
     def draw_icon(self, c: Canvas, x: float, y: float, size: float) -> None:
-        oldcolor = c._fillColorObj
+        c.saveState()
 
         c.setFillColor(self.color)
         path = c.beginPath()
@@ -67,7 +67,7 @@ class LED(Diode):
         path.close()
         c.drawPath(path, 0, 1)
 
-        c.setFillColor(oldcolor)
+        c.restoreState()
 
         self.draw_diode(c, x, y, size)
 

@@ -2,8 +2,6 @@ from src.components.component import BasicComponent
 
 from reportlab.pdfgen.canvas import Canvas
 
-from math import sin, cos, pi
-
 class Spring(BasicComponent):
     def __init__(self, d: str, l: str):
         self.value = l

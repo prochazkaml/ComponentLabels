@@ -28,7 +28,7 @@ def end_page(c: Canvas) -> None:
 def render_stickers(
     c: Canvas,
     layout: PaperConfig,
-    values: List[Component],
+    values: List[Component | None],
     draw_outlines: bool,
     draw_center_line: bool,
 ) -> None:
@@ -78,7 +78,7 @@ def main() -> None:
     # Add "None" if no label should get generated at a specific position.
     # ############################################################################
 
-    components: List[Component] = []
+    components: List[Component | None] = []
 
     # Resistors
 
@@ -130,37 +130,37 @@ def main() -> None:
 
     # BJTs
 
-    components.append(NPNBJT("2N2222", 3, 2, 1, "0.6 (6) V", "600 mA", "40 V"))
-    components.append(NPNBJT("2N3904", 3, 2, 1, "0.65 (6) V", "200 mA", "40 V"))
-    components.append(PNPBJT("2N3906", 3, 2, 1, "-0.65 (-5) V", "-200 mA", "-40 V"))
-    components.append(PNPBJT("2N5401", 3, 2, 1, "-1 (-5) V", "-600 mA", "-150 V"))
-    components.append(NPNBJT("2N5551", 3, 2, 1, "1 (6) V", "600 mA", "160 V"))
-    components.append(PNPBJT("A1015", 2, 3, 1, "-1.1 (-5) V", "-150 mA", "-50 V"))
-    components.append(NPNBJT("C1815", 2, 3, 1, "1 (5) V", "150 mA", "50 V"))
-    components.append(NPNBJT("C945", 2, 3, 1, "1 (5) V", "150 mA", "50 V"))
+    components.append(NPNBJT("2N2222", "3", "2", "1", "0.6 (6) V", "600 mA", "40 V"))
+    components.append(NPNBJT("2N3904", "3", "2", "1", "0.65 (6) V", "200 mA", "40 V"))
+    components.append(PNPBJT("2N3906", "3", "2", "1", "-0.65 (-5) V", "-200 mA", "-40 V"))
+    components.append(PNPBJT("2N5401", "3", "2", "1", "-1 (-5) V", "-600 mA", "-150 V"))
+    components.append(NPNBJT("2N5551", "3", "2", "1", "1 (6) V", "600 mA", "160 V"))
+    components.append(PNPBJT("A1015",  "2", "3", "1", "-1.1 (-5) V", "-150 mA", "-50 V"))
+    components.append(NPNBJT("C1815",  "2", "3", "1", "1 (5) V", "150 mA", "50 V"))
+    components.append(NPNBJT("C945",   "2", "3", "1", "1 (5) V", "150 mA", "50 V"))
 
-    components.append(NPNBJT("S8050", 3, 2, 1, "1 (6) V", "1.5 A", "25 V"))
-    components.append(PNPBJT("S8550", 3, 2, 1, "-0.66 (-6) V", "-1.5 A", "-25 V"))
-    components.append(PNPBJT("S9012", 3, 2, 1, "-0.66 (-5) V", "-500 mA", "-20 V"))
-    components.append(NPNBJT("S9013", 3, 2, 1, "1.2 (5) V", "500 mA", "25 V"))
-    components.append(NPNBJT("S9014", 3, 2, 1, "0.85 (5) V", "500 mA", "45 V"))
-    components.append(PNPBJT("S9015", 3, 2, 1, "-1 (-5) V", "-100 mA", "-45 V"))
-    components.append(PNPBJT("BC327", 1, 2, 3, "-1.2 (-5) V", "-800 mA", "-45 V"))
-    components.append(NPNBJT("BC337", 1, 2, 3, "1.2 (5) V", "800 mA", "45 V"))
+    components.append(NPNBJT("S8050", "3", "2", "1", "1 (6) V", "1.5 A", "25 V"))
+    components.append(PNPBJT("S8550", "3", "2", "1", "-0.66 (-6) V", "-1.5 A", "-25 V"))
+    components.append(PNPBJT("S9012", "3", "2", "1", "-0.66 (-5) V", "-500 mA", "-20 V"))
+    components.append(NPNBJT("S9013", "3", "2", "1", "1.2 (5) V", "500 mA", "25 V"))
+    components.append(NPNBJT("S9014", "3", "2", "1", "0.85 (5) V", "500 mA", "45 V"))
+    components.append(PNPBJT("S9015", "3", "2", "1", "-1 (-5) V", "-100 mA", "-45 V"))
+    components.append(PNPBJT("BC327", "1", "2", "3", "-1.2 (-5) V", "-800 mA", "-45 V"))
+    components.append(NPNBJT("BC337", "1", "2", "3", "1.2 (5) V", "800 mA", "45 V"))
 
-    components.append(NPNBJT("BC517", 1, 2, 3, "1.4 (10) V", "1.2 A", "30 V"))
-    components.append(NPNBJT("BC547", 1, 2, 3, "0.9 (6) V", "100 mA", "45 V"))
-    components.append(NPNBJT("BC548", 1, 2, 3, "0.9 (5) V", "100 mA", "30 V"))
-    components.append(NPNBJT("BC549", 1, 2, 3, "0.9 (5) V", "100 mA", "30 V"))
-    components.append(NPNBJT("BC550", 1, 2, 3, "0.9 (5) V", "100 mA", "45 V"))
-    components.append(PNPBJT("BC556", 1, 2, 3, "-1 (-5) V", "-100 mA", "-65 V"))
-    components.append(PNPBJT("BC557", 1, 2, 3, "-1 (-5) V", "-100 mA", "-45 V"))
-    components.append(PNPBJT("BC588", 1, 2, 3, "-1 (-5) V", "-100 mA", "-30 V"))
+    components.append(NPNBJT("BC517", "1", "2", "3", "1.4 (10) V", "1.2 A", "30 V"))
+    components.append(NPNBJT("BC547", "1", "2", "3", "0.9 (6) V", "100 mA", "45 V"))
+    components.append(NPNBJT("BC548", "1", "2", "3", "0.9 (5) V", "100 mA", "30 V"))
+    components.append(NPNBJT("BC549", "1", "2", "3", "0.9 (5) V", "100 mA", "30 V"))
+    components.append(NPNBJT("BC550", "1", "2", "3", "0.9 (5) V", "100 mA", "45 V"))
+    components.append(PNPBJT("BC556", "1", "2", "3", "-1 (-5) V", "-100 mA", "-65 V"))
+    components.append(PNPBJT("BC557", "1", "2", "3", "-1 (-5) V", "-100 mA", "-45 V"))
+    components.append(PNPBJT("BC588", "1", "2", "3", "-1 (-5) V", "-100 mA", "-30 V"))
 
     # MOSFETs
 
-    components.append(NMOSFET("IRF520", 1, 2, 3, "2..4 V", "6.5 A", "100 V"))
-    components.append(PMOSFET("IRF9520", 1, 2, 3, "-2..4 V", "-4.8 A", "-100 V"))
+    components.append(NMOSFET("IRF520", "1", "2", "3", "2..4 V", "6.5 A", "100 V"))
+    components.append(PMOSFET("IRF9520", "1", "2", "3", "-2..4 V", "-4.8 A", "-100 V"))
 
     # Diodes
 

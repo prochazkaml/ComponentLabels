@@ -1,18 +1,29 @@
 from src.stickerrect import StickerRect
 
 from reportlab.pdfgen.canvas import Canvas
-from reportlab.lib.colors import black, HexColor, gray
+from reportlab.lib.colors import Color, black, HexColor, gray
 from reportlab.lib.units import inch
 
 from typing import List
 from math import pow, sin, cos, pi
 
 class Component:
-    def draw(self, c: Canvas, rect: StickerRect, draw_center_line: bool) -> None:
+    def __init__(self):
+        self.exp = 0
+        self.val = 0
+        self.value = ""
+        self.str1 = ""
+        self.str2 = ""
+        self.str3 = ""
+        self.type = ""
+        self.units = ""
+        raise Exception("called parent class")
+    
+    def draw_icon(self, c: Canvas, x: float, y: float, size: float) -> None:
         raise Exception("called parent class")
 
-    def get_value(self) -> float:
-        return self.val * pow(10, self.exp - 2)
+    def draw(self, c: Canvas, rect: StickerRect, draw_center_line: bool) -> None:
+        raise Exception("called parent class")
 
     def get_prefix(self) -> str:
         if self.exp >= 12:
@@ -34,7 +45,7 @@ class Component:
 
         return "p"
 
-    def color_table(self, num: int) -> HexColor:
+    def color_table(self, num: int) -> Color:
         return [
             HexColor("#000000"),
             HexColor("#964B00"),
@@ -65,7 +76,7 @@ class Component:
         y: float,
         width: float,
         height: float,
-        color_table: List[HexColor]
+        color_table: List[Color]
     ) -> None:
         c.setFillColor(color_table[2])
         c.rect(x, y+height*5/6, width, height/6, fill=1, stroke=0)
