@@ -138,9 +138,6 @@ class Component:
     ) -> None:
         exp=self.exp + exp_shift
 
-        if exp < num_codes - 4:
-            return
-
         border=0
         corner=0
         stripe_width=width/num_codes/2
