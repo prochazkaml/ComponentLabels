@@ -1,4 +1,4 @@
-from reportlab.lib.colors import HexColor
+from reportlab.lib.colors import HexColor, black
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -8,8 +8,8 @@ from src.components.resistor import Resistor
 from src.components.capacitor import Capacitor
 from src.components.transistor import NPNBJT, PNPBJT, NMOSFET, PMOSFET
 from src.components.diode import Diode, SchottkyDiode, ZenerDiode, LED
-from src.components.nut import SquareNut, HexNut
-from src.components.screw import RecessedHeadScrew, RoundHeadScrew
+from src.components.nut import SquareNut, HexNut, Washer
+from src.components.screw import RecessedHeadScrew, RoundHeadScrew, FlatHeadScrew
 from src.components.threadedinsert import ThreadedInsert
 from src.components.spring import CompressionSpring, ExtensionSpring
 from src.paperconfig import PaperConfig, AVERY_5260, AVERY_L7157, VYSOCINA
@@ -80,6 +80,10 @@ def main() -> None:
 
     components: List[Component] = []
 
+    # Resistors
+
+    components.append(Resistor(0))
+
     common_resistor_values: List[float] = [
         # E6
         # 1, 1.5, 2.2, 3.3, 4.7, 6.8
@@ -93,7 +97,7 @@ def main() -> None:
         # E24
         # 1, 1.1, 1.2, 1.3, 1.5, 1.6, 1.8, 2, 2.2, 2.4, 2.7, 3, 3.3, 3.6, 3.9, 4.3, 4.7, 5.1, 5.6, 6.2, 6.8, 7.5, 8.2, 9.1
     ]
-
+    
     for exponent in range(6): # Ohms to 100kOhms (exclusive)
         for value in common_resistor_values:
             components.append(Resistor(value * (10 ** exponent)))
@@ -101,9 +105,15 @@ def main() -> None:
     resistor_values: List[float] = [
         3300000, 4700000, 5600000, 10000000
     ]
-    
+
     for value in resistor_values:
         components.append(Resistor(value))
+
+    # Precise resistor
+
+    components.append(Resistor(560000, True))
+
+    # Capacitors
 
     capacitor_values: List[float] = [ # in pF
         2, 2.2, 3, 5, 10, 15, 22, 30, 33, 47, 68, 75, 82, 100, 150, 220, 330, 470, 680,
@@ -113,28 +123,73 @@ def main() -> None:
     for value in capacitor_values:
         components.append(Capacitor(value * .000000000001))
 
-    components.append(RoundHeadScrew("M5", "10 mm", "4.2 mm", "30 mm"))
-    components.append(RoundHeadScrew("M3", "6 mm", "2.6 mm", "6 mm"))
-    components.append(RoundHeadScrew("M3", "6 mm", "2.6 mm", "16 mm"))
-    components.append(RoundHeadScrew("M3", "6 mm", "2.6 mm", "20 mm"))
+    # Padding
 
-    components.append(RecessedHeadScrew("M3", "5.6 mm", "2 mm", "7 mm"))
-    
-    components.append(HexNut("M5", "4 mm", "8 mm", "9 mm"))
-    components.append(HexNut("M3", "2.2 mm", "5.5 mm", "6.3 mm"))
+    components.append(None)
+    components.append(None)
 
-    components.append(SquareNut("M5", "3 mm", "8 mm", "11.3 mm"))
+    # BJTs
+
+    components.append(NPNBJT("2N2222", 3, 2, 1, "0.6 (6) V", "600 mA", "40 V"))
+    components.append(NPNBJT("2N3904", 3, 2, 1, "0.65 (6) V", "200 mA", "40 V"))
+    components.append(PNPBJT("2N3906", 3, 2, 1, "-0.65 (-5) V", "-200 mA", "-40 V"))
+    components.append(PNPBJT("2N5401", 3, 2, 1, "-1 (-5) V", "-600 mA", "-150 V"))
+    components.append(NPNBJT("2N5551", 3, 2, 1, "1 (6) V", "600 mA", "160 V"))
+    components.append(PNPBJT("A1015", 2, 3, 1, "-1.1 (-5) V", "-150 mA", "-50 V"))
+    components.append(NPNBJT("C1815", 2, 3, 1, "1 (5) V", "150 mA", "50 V"))
+    components.append(NPNBJT("C945", 2, 3, 1, "1 (5) V", "150 mA", "50 V"))
+
+    components.append(NPNBJT("S8050", 3, 2, 1, "1 (6) V", "1.5 A", "25 V"))
+    components.append(PNPBJT("S8550", 3, 2, 1, "-0.66 (-6) V", "-1.5 A", "-25 V"))
+    components.append(PNPBJT("S9012", 3, 2, 1, "-0.66 (-5) V", "-500 mA", "-20 V"))
+    components.append(NPNBJT("S9013", 3, 2, 1, "1.2 (5) V", "500 mA", "25 V"))
+    components.append(NPNBJT("S9014", 3, 2, 1, "0.85 (5) V", "500 mA", "45 V"))
+    components.append(PNPBJT("S9015", 3, 2, 1, "-1 (-5) V", "-100 mA", "-45 V"))
+    components.append(PNPBJT("BC327", 1, 2, 3, "-1.2 (-5) V", "-800 mA", "-45 V"))
+    components.append(NPNBJT("BC337", 1, 2, 3, "1.2 (5) V", "800 mA", "45 V"))
+
+    components.append(NPNBJT("BC517", 1, 2, 3, "1.4 (10) V", "1.2 A", "30 V"))
+    components.append(NPNBJT("BC547", 1, 2, 3, "0.9 (6) V", "100 mA", "45 V"))
+    components.append(NPNBJT("BC548", 1, 2, 3, "0.9 (5) V", "100 mA", "30 V"))
+    components.append(NPNBJT("BC549", 1, 2, 3, "0.9 (5) V", "100 mA", "30 V"))
+    components.append(NPNBJT("BC550", 1, 2, 3, "0.9 (5) V", "100 mA", "45 V"))
+    components.append(PNPBJT("BC556", 1, 2, 3, "-1 (-5) V", "-100 mA", "-65 V"))
+    components.append(PNPBJT("BC557", 1, 2, 3, "-1 (-5) V", "-100 mA", "-45 V"))
+    components.append(PNPBJT("BC588", 1, 2, 3, "-1 (-5) V", "-100 mA", "-30 V"))
+
+    # MOSFETs
+
+    components.append(NMOSFET("IRF520", 1, 2, 3, "2..4 V", "6.5 A", "100 V"))
+    components.append(PMOSFET("IRF9520", 1, 2, 3, "-2..4 V", "-4.8 A", "-100 V"))
+
+    # Diodes
+
+    components.append(Diode("1N4148", "1 V", "300 mA", "75 V"))
+    components.append(Diode("1N4007", "1.1 V", "1 A", "1 kV"))
+
+    components.append(SchottkyDiode("PMEG3050", "360 mV", "5 A", "30 V"))
+    components.append(SchottkyDiode("BAT41", "400 mV", "100 mA", "100 V"))
+    components.append(SchottkyDiode("1N5819", "600 mV", "1 A", "40 V"))
+    components.append(SchottkyDiode("BAT85", "400 mV", "200 mA", "30 V"))
     
-    components.append(ThreadedInsert("M2", "3.5 mm", "3 mm"))
-    components.append(ThreadedInsert("M2", "3.5 mm", "4 mm"))
-    components.append(ThreadedInsert("M2", "3.5 mm", "5 mm"))
-    components.append(ThreadedInsert("M2.5", "3.5 mm", "3 mm"))
-    components.append(ThreadedInsert("M2.5", "3.5 mm", "4 mm"))
-    components.append(ThreadedInsert("M2.5", "3.5 mm", "5 mm"))
-    components.append(ThreadedInsert("M3", "4.5 mm", "3 mm"))
-    components.append(ThreadedInsert("M3", "4.5 mm", "4 mm"))
-    components.append(ThreadedInsert("M3", "5 mm", "4 mm"))
-    components.append(ThreadedInsert("M3", "5 mm", "5 mm"))
+    components.append(ZenerDiode("ZPD3V6", "3.4-3.8 V", "5 mA", "1 V"))
+
+    # Diodes that emit light
+
+    components.append(LED("5 mm", "1.2 V", "20 mA", "940 nm", HexColor("#800000")))
+    components.append(LED("5 mm", "3.0-3.2 V", "20 mA", "* nm", HexColor("#FFFFFF")))
+    components.append(LED("5 mm", "1.9-2.1 V", "20 mA", "620-625 nm", HexColor("#FF0000")))
+    components.append(LED("5 mm", "1.9-2.1 V", "20 mA", "588-590 nm", HexColor("#FFFF00")))
+    components.append(LED("5 mm", "2.1-3.0 V", "20 mA", "567-570 nm", HexColor("#00FF00")))
+    components.append(LED("5 mm", "3.0-3.2 V", "20 mA", "455-465 nm", HexColor("#0000FF")))
+
+    components.append(LED("3 mm", "3.0-3.2 V", "20 mA", "* nm", HexColor("#FFFFFF")))
+    components.append(LED("3 mm", "1.9-2.1 V", "20 mA", "620-625 nm", HexColor("#FF0000")))
+    components.append(LED("3 mm", "1.9-2.1 V", "20 mA", "588-590 nm", HexColor("#FFFF00")))
+    components.append(LED("3 mm", "2.1-3.0 V", "20 mA", "567-570 nm", HexColor("#00FF00")))
+    components.append(LED("3 mm", "3.0-3.2 V", "20 mA", "455-465 nm", HexColor("#0000FF")))
+    
+    # Springs
 
     components.append(ExtensionSpring("5 mm", "20.5 mm"))
     components.append(ExtensionSpring("5.5 mm", "25.5 mm"))
@@ -158,54 +213,106 @@ def main() -> None:
     components.append(CompressionSpring("9 mm", "35 mm"))
     components.append(CompressionSpring("5.5 mm", "17 mm"))
 
-    components.append(NPNBJT("2N2222", 3, 2, 1, "0.6 (6) V", "600 mA", "40 V"))
-    components.append(NPNBJT("2N3904", 3, 2, 1, "0.65 (6) V", "200 mA", "40 V"))
-    components.append(PNPBJT("2N3906", 3, 2, 1, "-0.65 (-5) V", "-200 mA", "-40 V"))
-    components.append(PNPBJT("2N5401", 3, 2, 1, "-1 (-5) V", "-600 mA", "-150 V"))
-    components.append(NPNBJT("2N5551", 3, 2, 1, "1 (6) V", "600 mA", "160 V"))
-    components.append(PNPBJT("A1015", 2, 3, 1, "-1.1 (-5) V", "-150 mA", "-50 V"))
-    components.append(NPNBJT("C1815", 2, 3, 1, "1 (5) V", "150 mA", "50 V"))
-    components.append(NPNBJT("C945", 2, 3, 1, "1 (5) V", "150 mA", "50 V"))
-    
-    components.append(NPNBJT("S8050", 3, 2, 1, "1 (6) V", "1.5 A", "25 V"))
-    components.append(PNPBJT("S8550", 3, 2, 1, "-0.66 (-6) V", "-1.5 A", "-25 V"))
-    components.append(PNPBJT("S9012", 3, 2, 1, "-0.66 (-5) V", "-500 mA", "-20 V"))
-    components.append(NPNBJT("S9013", 3, 2, 1, "1.2 (5) V", "500 mA", "25 V"))
-    components.append(NPNBJT("S9014", 3, 2, 1, "0.85 (5) V", "500 mA", "45 V"))
-    components.append(PNPBJT("S9015", 3, 2, 1, "-1 (-5) V", "-100 mA", "-45 V"))
-    components.append(PNPBJT("BC327", 1, 2, 3, "-1.2 (-5) V", "-800 mA", "-45 V"))
-    components.append(NPNBJT("BC337", 1, 2, 3, "1.2 (5) V", "800 mA", "45 V"))
-    
-    components.append(NPNBJT("BC517", 1, 2, 3, "1.4 (10) V", "1.2 A", "30 V"))
-    components.append(NPNBJT("BC547", 1, 2, 3, "0.9 (6) V", "100 mA", "45 V"))
-    components.append(NPNBJT("BC548", 1, 2, 3, "0.9 (5) V", "100 mA", "30 V"))
-    components.append(NPNBJT("BC549", 1, 2, 3, "0.9 (5) V", "100 mA", "30 V"))
-    components.append(NPNBJT("BC550", 1, 2, 3, "0.9 (5) V", "100 mA", "45 V"))
-    components.append(PNPBJT("BC556", 1, 2, 3, "-1 (-5) V", "-100 mA", "-65 V"))
-    components.append(PNPBJT("BC557", 1, 2, 3, "-1 (-5) V", "-100 mA", "-45 V"))
-    components.append(PNPBJT("BC588", 1, 2, 3, "-1 (-5) V", "-100 mA", "-30 V"))
-    
-    components.append(NMOSFET("IRF520", 1, 2, 3, "2..4 V", "6.5 A", "100 V"))
-    components.append(PMOSFET("IRF9520", 1, 2, 3, "-2..4 V", "-4.8 A", "-100 V"))
-    
-    components.append(Diode("1N4148", "1 V", "300 mA", "75 V"))
-    components.append(Diode("1N4007", "1.1 V", "1 A", "1 kV"))
-    components.append(SchottkyDiode("PMEG3050", "360 mV", "5 A", "30 V"))
-    components.append(ZenerDiode("ZPD3V6", "3.4-3.8 V", "5 mA", "1 V"))
+    # Threaded inserts
 
-    components.append(LED("5 mm", "1.2 V", "20 mA", "940 nm", HexColor("#800000")))
-    components.append(LED("5 mm", "3.0-3.2 V", "20 mA", "* nm", HexColor("#FFFFFF")))
-    components.append(LED("5 mm", "1.9-2.1 V", "20 mA", "620-625 nm", HexColor("#FF0000")))
-    components.append(LED("5 mm", "1.9-2.1 V", "20 mA", "588-590 nm", HexColor("#FFFF00")))
-    components.append(LED("5 mm", "2.1-3.0 V", "20 mA", "567-570 nm", HexColor("#00FF00")))
-    components.append(LED("5 mm", "3.0-3.2 V", "20 mA", "455-465 nm", HexColor("#0000FF")))
+    components.append(ThreadedInsert("M2", "3.5 mm", "3 mm"))
+    components.append(ThreadedInsert("M2", "3.5 mm", "4 mm"))
+    components.append(ThreadedInsert("M2", "3.5 mm", "5 mm"))
+    components.append(ThreadedInsert("M2.5", "3.5 mm", "3 mm"))
+    components.append(ThreadedInsert("M2.5", "3.5 mm", "4 mm"))
+    components.append(ThreadedInsert("M2.5", "3.5 mm", "5 mm"))
+    components.append(ThreadedInsert("M3", "4.5 mm", "3 mm"))
+    components.append(ThreadedInsert("M3", "4.5 mm", "4 mm"))
+    components.append(ThreadedInsert("M3", "5 mm", "4 mm"))
+    components.append(ThreadedInsert("M3", "5 mm", "5 mm"))
 
-    components.append(LED("3 mm", "3.0-3.2 V", "20 mA", "* nm", HexColor("#FFFFFF")))
-    components.append(LED("3 mm", "1.9-2.1 V", "20 mA", "620-625 nm", HexColor("#FF0000")))
-    components.append(LED("3 mm", "1.9-2.1 V", "20 mA", "588-590 nm", HexColor("#FFFF00")))
-    components.append(LED("3 mm", "2.1-3.0 V", "20 mA", "567-570 nm", HexColor("#00FF00")))
-    components.append(LED("3 mm", "3.0-3.2 V", "20 mA", "455-465 nm", HexColor("#0000FF")))
+    # Round head screws
+
+    components.append(RoundHeadScrew("M2", "4 mm", "1.7 mm", "5 mm")) # Length is a separate parameter
+    components.append(RoundHeadScrew("M2", "4 mm", "1.7 mm", "6 mm"))
+    components.append(RoundHeadScrew("M2", "4 mm", "1.7 mm", "8 mm"))
     
+    components.append(RoundHeadScrew("M2x5", "4 mm", "1.7 mm")) # Length is part of the name for easier searching
+    components.append(RoundHeadScrew("M2x6", "4 mm", "1.7 mm"))
+    components.append(RoundHeadScrew("M2x8", "4 mm", "1.7 mm"))
+
+    components.append(RoundHeadScrew("M2.5", "5 mm", "2.4 mm", "6 mm"))
+    components.append(RoundHeadScrew("M2.5", "5 mm", "2.4 mm", "8 mm"))
+    components.append(RoundHeadScrew("M2.5", "5 mm", "2.4 mm", "12 mm"))
+    components.append(RoundHeadScrew("M2.5", "5 mm", "2.4 mm", "16 mm"))
+    components.append(RoundHeadScrew("M2.5", "5 mm", "2.4 mm", "20 mm"))
+
+    components.append(RoundHeadScrew("M2.5x6", "5 mm", "2.4 mm"))
+    components.append(RoundHeadScrew("M2.5x8", "5 mm", "2.4 mm"))
+    components.append(RoundHeadScrew("M2.5x12", "5 mm", "2.4 mm"))
+    components.append(RoundHeadScrew("M2.5x16", "5 mm", "2.4 mm"))
+    components.append(RoundHeadScrew("M2.5x20", "5 mm", "2.4 mm"))
+
+    components.append(RoundHeadScrew("M3", "6 mm", "2.6 mm", "6 mm"))
+    components.append(RoundHeadScrew("M3", "6 mm", "2.6 mm", "12 mm"))
+    components.append(RoundHeadScrew("M3", "6 mm", "2.6 mm", "16 mm"))
+    components.append(RoundHeadScrew("M3", "6 mm", "2.6 mm", "20 mm"))
+
+    components.append(RoundHeadScrew("M3x6", "6 mm", "2.6 mm"))
+    components.append(RoundHeadScrew("M3x6", "6 mm", "2.6 mm"))
+    components.append(RoundHeadScrew("M3x8", "6 mm", "2.6 mm"))
+    components.append(RoundHeadScrew("M3x10", "6 mm", "2.6 mm"))
+    components.append(RoundHeadScrew("M3x12", "6 mm", "2.6 mm"))
+    components.append(RoundHeadScrew("M3x12", "6 mm", "2.6 mm"))
+    components.append(RoundHeadScrew("M3x16", "6 mm", "2.6 mm"))
+    components.append(RoundHeadScrew("M3x20", "6 mm", "2.6 mm"))
+
+    components.append(RoundHeadScrew("M5", "10 mm", "4.2 mm", "6 mm"))
+    components.append(RoundHeadScrew("M5", "10 mm", "4.2 mm", "30 mm"))
+
+    components.append(RoundHeadScrew("M5x6", "10 mm", "4.2 mm"))
+    components.append(RoundHeadScrew("M5x12", "10 mm", "4.2 mm"))
+    components.append(RoundHeadScrew("M5x20", "10 mm", "4.2 mm"))
+    components.append(RoundHeadScrew("M5x25", "10 mm", "4.2 mm"))
+    components.append(RoundHeadScrew("M5x30", "10 mm", "4.2 mm"))
+
+    # Flat head screws
+
+    components.append(FlatHeadScrew("M2.5", "4.4 mm", "1.8 mm", "12 mm"))
+    components.append(FlatHeadScrew("M2.5", "4.4 mm", "1.8 mm", "14 mm"))
+    components.append(FlatHeadScrew("M2.5", "4.4 mm", "1.8 mm", "16 mm"))
+    components.append(FlatHeadScrew("M2.5x12", "4.4 mm", "1.8 mm"))
+    components.append(FlatHeadScrew("M2.5x14", "4.4 mm", "1.8 mm"))
+    components.append(FlatHeadScrew("M2.5x16", "4.4 mm", "1.8 mm"))
+
+    components.append(FlatHeadScrew("M2.5x4", "4.6 mm", "2 mm"))
+    components.append(FlatHeadScrew("M2x4", "3.8 mm", "1.6 mm"))
+
+    # Recessed head screws
+
+    components.append(RecessedHeadScrew("M3", "5.6 mm", "2 mm", "7 mm"))
+    components.append(RecessedHeadScrew("M3x7", "5.6 mm", "2 mm"))
+
+    # Hex nuts
+
+    components.append(HexNut("M2", "1.8 mm", "4 mm", "4.5 mm"))
+    components.append(HexNut("M2.5", "2 mm", "5 mm", "5.7 mm"))
+    components.append(HexNut("M3", "2.2 mm", "5.5 mm", "6.3 mm"))
+    components.append(HexNut("M5", "4 mm", "8 mm", "9 mm"))
+
+    # Square nuts
+
+    components.append(SquareNut("M3", "1.8 mm", "5.4 mm", "7.2 mm"))
+    components.append(SquareNut("M4", "2.2 mm", "6.8 mm", "9.4 mm"))
+    components.append(SquareNut("M5", "3 mm", "8 mm", "11.3 mm"))
+
+    # Washers
+
+    components.append(Washer("M2.5", "0.6 mm", "6 mm"))
+    components.append(Washer("M3", "0.6 mm", "7 mm"))
+    components.append(Washer("M5", "1.1 mm", "10 mm"))
+
+    # These labels are useful for "random garbage" bags
+
+    components.append(LED("???", "??? V", "??? mA", "??? nm", HexColor("#FFC0C0")))
+    components.append(Diode("???", "? V", "??? mA", "??? V"))
+    components.append(NPNBJT("???", "?", "?", "?", "??? V", "??? A", "??? V"))
+
     # ############################################################################
     # Further configuration options
     #
