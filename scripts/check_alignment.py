@@ -21,7 +21,7 @@ def parse_args():
         "-l",
         "--labels",
         type=pathlib.Path,
-        help="Path to the generatel labels PDF.",
+        help="Path to the generated labels PDF.",
         required=True,
     )
     parser.add_argument(
@@ -49,10 +49,7 @@ def combine_pdfs(template_path, labels_path, output_path):
     template_reader = PdfReader(template_path)
     labels_reader = PdfReader(labels_path)
     writer = PdfWriter()
-    
-    if len(template_reader.pages) != 1:
-        raise ValueError("Template PDF should contain exactly one page.")
-    
+        
     for i in range(len(labels_reader.pages)):
         content_page = copy.deepcopy(template_reader.pages[0])
         content_page.merge_page(labels_reader.pages[i])
