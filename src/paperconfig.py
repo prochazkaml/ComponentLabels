@@ -60,6 +60,21 @@ AVERY_L7157 = PaperConfig(
 )
 
 
+AVERY_J8157 = PaperConfig(
+    paper_name="Avery J8157",
+    pagesize=A4,
+    sticker_width=64.1 * mm,
+    sticker_height=24.3 * mm,
+    sticker_corner_radius=3 * mm,
+    left_margin=5.4 * mm,
+    top_margin=14 * mm,
+    horizontal_stride=66.5 * mm,
+    vertical_stride=24.3 * mm,
+    num_stickers_horizontal=3,
+    num_stickers_vertical=11,
+)
+
+
 EJ_RANGE_24 = PaperConfig(
     paper_name="EJRange 24",
     pagesize=A4,

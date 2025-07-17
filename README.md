@@ -31,6 +31,16 @@ It is primarily meant for [these](https://www.obalyvysocina.cz/produkty/samolepi
 
 It will now generate a `ResistorLabels.pdf` that can be used to print onto AVERY 5260/L7157.
 
+# Development
+
+Development dependencies are defined in `requirements-dev.txt`
+
+## Label Alignment Helper Script
+
+`scripts/check_alignment.py` can be used during the development of new label definitions by merging a scanned copy of the labels with the generated PDF.
+
+For example: `./scripts/check_alignment.py --template scanned_labels.pdf --labels ComponentLabels.pdf --output combined.pdf` will produce a file named `combined.pdf` that will have the scanned labels as a background for each page and the generated labels overlayed.
+
 # More Details
 
 This is forked from https://github.com/securelyfitz/ResistorLabels, which is in turn a fork of https://github.com/Finomnis/ResistorLabels
